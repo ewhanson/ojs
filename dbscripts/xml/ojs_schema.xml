@@ -691,13 +691,13 @@
 		<field name="subscription_id" type="I8">
 			<NOTNULL/>
 		</field>
-		<field name="ip_string" type="C2" size="40">
+		<field name="ip_string" type="C2" size="90">
 			<NOTNULL/>
 		</field>
-		<field name="ip_start" type="I8">
+		<field name="ip_start" type="B">
 			<NOTNULL/>
 		</field>
-		<field name="ip_end" type="I8">
+		<field name="ip_end" type="B">
 		</field>
 		<descr>Journal institutional subscription IPs and IP ranges.</descr>
 		<index name="institutional_subscription_ip_subscription_id">

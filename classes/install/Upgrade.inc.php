@@ -3059,4 +3059,40 @@ class Upgrade extends Installer {
 
 		return true;
 	}
+
+	/**
+	 * 
+	 */
+	function convertInstitutionalSubscriptionIps() {
+		$institutionalSubscriptionDAO = DAORegistry::getDAO('InstitutionalSubscriptionDAO'); /* @var $institutionalSubscriptionDAO InstitutionalSubscriptionDAO */
+		$dataSource = $institutionalSubscriptionDAO->getDataSource();
+
+		// Retrieves temporary institutional subscription ip talbe
+		$ipResult =$institutionalSubscriptionDAO->retrieve(
+			'SELECT tisp.institutional_subscription_ip_id , tisp.temp_ip_start, tisp.temp_ip_end 
+			FROM temp_institutional_subscription_ip tisp'
+		);
+
+		while (!$ipResult->EOF) {
+			$row = $ipResult->GetRowAssoc(false);
+
+			// Converts ips stored from `ip2long()` and formats them as BLOB
+			// by `inet_pton()`. Works for IPv4 and IPv6
+			$newIpStart = inet_pton(long2ip($row['temp_ip_start']));
+			$newIpEnd = null;
+			if (!is_null($row['temp_ip_end'])){
+				$newIpEnd = inet_pton(long2ip($row['temp_ip_end']));
+			}
+
+			// Updates `temp_institutional_subscription_ip` with newly formatted IPs
+			// TODO: Check for other db drivers
+			$ipUpdateQuery = 'UPDATE temp_institutional_subscription_ip tisp SET tisp.ip_start=' . $dataSource->qstr($newIpStart) . ' , tisp.ip_end=' . $dataSource->qstr($newIpEnd) . ' WHERE tisp.institutional_subscription_ip_id=' . $dataSource->qstr($row['institutional_subscription_ip_id']);
+			$institutionalSubscriptionDAO->update($ipUpdateQuery);
+
+			$ipResult->MoveNext();
+		}
+		$ipResult->Close();
+		
+		return true;
+	}
 }

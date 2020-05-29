@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE data SYSTEM "../../../lib/pkp/dtd/xmlData.dtd">
+
+<!--
+	* dbscripts/xml/upgrade/3.2.1_preupdate_institutional_subscription_ip.xml
+	*
+	* Copyright (c) 2013-2020 Simon Fraser University
+	* Copyright (c) 2003-2020 John Willinsky
+	* Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+	*
+	* Copy the institutional_subscription_ip table so we can migrate the converted
+	* ip_start and ip_end columns from BIGINT to BLOB for IPv6 compatability
+	*
+	-->
+
+<data>
+	<sql>
+		<query>CREATE TABLE temp_institutional_subscription_ip AS SELECT * FROM institutional_subscription_ip</query>
+        <query>ALTER TABLE temp_institutional_subscription_ip CHANGE ip_string ip_string VARCHAR(90)</query>
+        <query>ALTER TABLE temp_institutional_subscription_ip CHANGE ip_start temp_ip_start BIGINT(20) NOT NULL</query>
+        <query>ALTER TABLE temp_institutional_subscription_ip CHANGE ip_end temp_ip_end BIGINT(20)</query>
+        <query>ALTER TABLE temp_institutional_subscription_ip ADD ip_start BLOB NOT NULL</query>
+        <query>ALTER TABLE temp_institutional_subscription_ip ADD ip_end BLOB</query>
+        <dropindex table="institutional_subscription_ip" index="institutional_subscription_ip_start" />
+        <dropindex table="institutional_subscription_ip" index="institutional_subscription_ip_end" />
+	</sql>
+</data>

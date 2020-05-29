@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE data SYSTEM "../../../lib/pkp/dtd/xmlData.dtd">
+
+<!--
+	* dbscripts/xml/upgrade/3.2.1_preupdate_institutional_subscription_ip.xml
+	*
+	* Copyright (c) 2013-2020 Simon Fraser University
+	* Copyright (c) 2003-2020 John Willinsky
+	* Distributed under the GNU GPL v3. For full terms see the file docs/COPYING.
+	*
+	* Migrates ip_start and ip_end columns back to institutional_subscription_ip
+    * table after data type transformation in convertInstitutionalSubscriptionIps
+    * in Upgrade.inc.php
+	*
+	-->
+
+<data>
+	<sql>
+		<query>UPDATE institutional_subscription_ip isp SET isp.ip_start = (SELECT tisp.ip_start FROM temp_institutional_subscription_ip tisp WHERE tisp.institutional_subscription_ip_id = isp.institutional_subscription_ip_id)</query>
+    	<query>UPDATE institutional_subscription_ip isp SET isp.ip_end = (SELECT tisp.ip_end FROM temp_institutional_subscription_ip tisp WHERE tisp.institutional_subscription_ip_id = isp.institutional_subscription_ip_id)</query>
+		<drop table="temp_institutional_subscription_ip" />
+	</sql>
+</data>
