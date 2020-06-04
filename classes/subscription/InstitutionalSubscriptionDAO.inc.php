@@ -564,7 +564,8 @@ class InstitutionalSubscriptionDAO extends SubscriptionDAO {
 
 		// Check for IP match
 		if (!empty($IP)) {
-			$IP = sprintf('%u', ip2long($IP));
+			$IP = inet_pton($IP);
+			// $IP = sprintf('%u', ip2long($IP));
 
 			$result = $this->retrieve(
 				'SELECT	isip.subscription_id
@@ -711,6 +712,13 @@ class InstitutionalSubscriptionDAO extends SubscriptionDAO {
 		while (list(, $curIPString) = each($ipRanges)) {
 			$ipStart = null;
 			$ipEnd = null;
+			$isIpv6 = false;
+
+			// Check IP address type
+			$packedIp = inet_pton($curIPString);
+			if (isset($packedIp[4])) {
+				$isIpv6 = true;
+			}
 
 			// Parse and check single IP string
 			if (strpos($curIPString, SUBSCRIPTION_IP_RANGE_RANGE) === false) {
@@ -720,38 +728,121 @@ class InstitutionalSubscriptionDAO extends SubscriptionDAO {
 
 					// Get non-CIDR IP
 					if (strpos($curIPString, '/') === false) {
-						$ipStart = sprintf("%u", ip2long(trim($curIPString)));
+						// $ipStart = sprintf("%u", ip2long(trim($curIPString)));
+						$ipStart = inet_pton(trim($curIPString));
 
 					// Convert CIDR IP to IP range
 					} else {
-						list($cidrIPString, $cidrBits) = explode('/', trim($curIPString));
+						if ($isIpv6) {
+							// IPv6 CIDR IP to IP range
+							// From: https://stackoverflow.com/questions/10085266/php5-calculate-ipv6-range-from-cidr-prefix
+							
+							// Split in address and prefix length
+							list($cidrIPString, $cidrBits) = explode('/', $curIPString);
 
-						if ($cidrBits == 0) {
-							$cidrMask = 0;
+							// Parse the address into a binary string
+							$addr_given_bin = inet_pton($cidrIPString);
+
+							// Convert the binary string to a string with hexadecimal characters
+							$addr_given_hex = bin2hex($addr_given_bin);
+
+							// Overwriting first address string to make sure notation is optimal
+							$cidrIPString = inet_ntop($addr_given_bin);
+
+							// Calculate the number of 'flexible' bits
+							$flexbits = 128 - $cidrBits;
+
+							// Build the hexadecimal strings of the first and last addresses
+							$addr_hex_first = $addr_given_hex;
+							$addr_hex_last = $addr_given_hex;
+
+							// We start at the end of the string (which is always 32 characters long)
+							$pos = 31;
+							while ($flexbits > 0) {
+								// Get the characters at this position
+								$orig_first = substr($addr_hex_first, $pos, 1);
+								$orig_last = substr($addr_hex_last, $pos, 1);
+
+								// Convert them to an integer
+								$origval_first = hexdec($orig_first);
+								$origval_last = hexdec($orig_last);
+
+								// First address: calculate the subnet mask. min() prevents the comparison from being negative
+								$mask = 0xf << (min(4, $flexbits));
+
+								// AND the original against its mask
+								$new_val_first = $origval_first & $mask;
+
+								// Last address: OR it with (2^flexbits)-1, with flexbits limited to 4 at a time
+								$new_val_last = $origval_last | (pow(2, min(4, $flexbits)) - 1);
+
+								// Convert them back to hexadecimal characters
+								$new_first = dechex($new_val_first);
+								$new_last = dechex($new_val_last);
+
+								// And put those character back in their strings
+								$addr_hex_first = substr_replace($addr_hex_first, $new_first, $pos, 1);
+								$addr_hex_last = substr_replace($addr_hex_last, $new_last, $pos, 1);
+
+								// We processed one nibble, move to previous position
+								$flexbits -= 4;
+								$pos -= 1;
+							}
+
+							// Convert the hexadecimal strings to a binary string
+							$ipStart = hex2bin($addr_hex_first);
+							$ipEnd = hex2bin($addr_hex_last);
+
 						} else {
-							$cidrMask = (0xffffffff << (32 - $cidrBits));
-						}
-
-						$ipStart = sprintf('%u', ip2long($cidrIPString) & $cidrMask);
-
-						if ($cidrBits != 32) {
-							$ipEnd = sprintf('%u', ip2long($cidrIPString) | (~$cidrMask & 0xffffffff));
+							// IPv4 CIDR IP to IP range
+							list($cidrIPString, $cidrBits) = explode('/', trim($curIPString));
+							
+							if ($cidrBits == 0) {
+								$cidrMask = 0;
+							} else {
+								$cidrMask = (0xffffffff << (32 - $cidrBits));
+							}
+							
+							$ipStartLong = ip2long($cidrIPString) & $cidrMask;
+							$ipStart = inet_pton(long2ip($ipStartLong));
+							
+							if ($cidrBits != 32) {
+								$ipEndLong = ip2long($cidrIPString) | (~$cidrMask & 0xffffffff);
+								$ipEnd = inet_pton(long2ip($ipEndLong));
+							}
 						}
 					}
 
 				// Convert wildcard IP to IP range
 				} else {
-					$ipStart = sprintf('%u', ip2long(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, '0', trim($curIPString))));
-					$ipEnd = sprintf('%u', ip2long(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, '255', trim($curIPString))));
+					if ($isIpv6) {
+						// IPv6 wildcard IP to IP range
+						$ipStart = inet_pton(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, '0000', trim($curIPString)));
+						$ipEnd = inet_pton(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, 'ffff', trim($curIPString)));
+					} else {
+						// IPv4 wildcard IP to IP range
+						$ipStart = inet_pton(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, '0', trim($curIPString)));
+						$ipEnd = inet_pton(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, '255', trim($curIPString)));
+					}
 				}
 
 			// Convert wildcard IP range to IP range
 			} else {
 				list($ipStart, $ipEnd) = explode(SUBSCRIPTION_IP_RANGE_RANGE, $curIPString);
+				
+				if ($isIpv6) {
+					// IPv6 wildcard IP range to IP range
+					// Replace wildcards in start and end of range
 
-				// Replace wildcards in start and end of range
-				$ipStart = sprintf('%u', ip2long(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, '0', trim($ipStart))));
-				$ipEnd = sprintf('%u', ip2long(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, '255', trim($ipEnd))));
+					$ipStart = inet_pton(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, '0000', trim($ipStart)));
+					$ipEnd = inet_pton(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, 'ffff', trim($ipEnd)));					
+				} else {
+					// IPv4 wildcard IP range to IP range
+					
+					// Replace wildcards in start and end of range
+					$ipStart = inet_pton(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, '0', trim($ipStart)));
+					$ipEnd = inet_pton(str_replace(SUBSCRIPTION_IP_RANGE_WILDCARD, '255', trim($ipEnd)));
+				}
 			}
 
 			// Insert IP or IP range
