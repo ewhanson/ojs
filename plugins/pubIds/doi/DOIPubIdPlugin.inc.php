@@ -37,8 +37,69 @@ class DOIPubIdPlugin extends PubIdPlugin {
 			HookRegistry::register('Galley::getProperties::values', array($this, 'modifyObjectPropertyValues'));
 			HookRegistry::register('Form::config::before', array($this, 'addPublicationFormFields'));
 			HookRegistry::register('Form::config::before', array($this, 'addPublishFormNotice'));
+			// New
+			HookRegistry::register('TemplateManager::setupBackendPage', array($this, 'setupDoiManagementPage'));
+			HookRegistry::register('LoadHandler', array($this, 'callbackLoadHandler'));
+			$this->_registerTemplateResource(true);
 		}
 		return $success;
+	}
+
+
+	/**
+	 * Sets up backend DOI management page
+	 *
+	 * @param $hookname string Name of hook being called
+	 * @param $args array Hook arguments
+	 */
+	function setupDoiManagementPage($hookname, $args) {
+		$request = Application::get()->getRequest();
+
+		$router = $request->getRouter();
+		$handler = $router->getHandler();
+		$userRoles = (array) $handler->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
+
+		$templateMgr = TemplateManager::getManager($request);
+		$menu = $templateMgr->getState('menu');
+
+		// Add DOI management page to nav menu
+		if (in_array(ROLE_ID_MANAGER, $userRoles)) {
+			$doiLink = [
+				'name' => __('plugins.pubIds.doi.manager.displayName'),
+				'url' => $router->url($request,null, 'doiManagement', 'management'),
+				//'url' => $router->url($request, null, 'manageIssues'),
+				'isCurrent' => $request->getRequestedPage() === 'manageIssues',
+			];
+
+			$menu['doiManagement'] = $doiLink;
+
+			$templateMgr->setState(['menu' => $menu]);
+		}
+	}
+
+	/**
+	 * @see PKPPageRouter::route()
+	 * @param $hookName string
+	 * @param $args array [
+	 *  @option string page
+	 *  @option string op
+	 *  @option string handler file
+	 * ]
+	 *
+	 */
+	function callbackLoadHandler($hookname, $args) {
+		// Check the page.
+		$page = $args[0];
+		if ($page !== 'doiManagement') return;
+		// Check the operation.
+		$availableOps = array('management');
+		$op = $args[1];
+		if (!in_array($op, $availableOps)) return;
+		// The handler had been requested.
+		define('HANDLER_CLASS', 'DOIManagementHandler');
+		define('DOI_PLUGIN_NAME', $this->getName());
+		$handlerFile =& $args[2];
+		$handlerFile = $this->getPluginPath() . '/pages/doiManagement/' . 'DOIManagementHandler.inc.php';
 	}
 
 	//

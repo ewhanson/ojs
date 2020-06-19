@@ -20,6 +20,9 @@ msgstr "This plugin enables the assignment of the Digital Object Identifiers to 
 msgid "plugins.pubIds.doi.readerDisplayName"
 msgstr "DOI"
 
+msgid "plugins.pubIds.doi.manager.displayName"
+msgstr "DOI Management"
+
 msgid "plugins.pubIds.doi.manager.settings.description"
 msgstr "Please configure the DOI plugin to be able to manage and use DOIs in OJS:"
 
