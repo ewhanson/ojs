@@ -45,6 +45,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 		return $success;
 	}
 
+	// BEGIN NEW //
 
 	/**
 	 * Sets up backend DOI management page
@@ -67,11 +68,12 @@ class DOIPubIdPlugin extends PubIdPlugin {
 			$doiLink = [
 				'name' => __('plugins.pubIds.doi.manager.displayName'),
 				'url' => $router->url($request,null, 'doiManagement', 'management'),
-				//'url' => $router->url($request, null, 'manageIssues'),
-				'isCurrent' => $request->getRequestedPage() === 'manageIssues',
+				'isCurrent' => $request->getRequestedPage() === 'doiManagement',
 			];
 
-			$menu['doiManagement'] = $doiLink;
+			// Assign DOI Mangement link to 'Settings' submenu
+			$submenu =& $menu['settings']['submenu'];
+			$submenu['doiManagement'] = $doiLink;
 
 			$templateMgr->setState(['menu' => $menu]);
 		}
@@ -97,6 +99,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 		if (!in_array($op, $availableOps)) return;
 		// The handler had been requested.
 		define('HANDLER_CLASS', 'DOIManagementHandler');
+		// Plugin name needed to fetch plugin from Handler
 		define('DOI_PLUGIN_NAME', $this->getName());
 		$handlerFile =& $args[2];
 		$handlerFile = $this->getPluginPath() . '/pages/doiManagement/' . 'DOIManagementHandler.inc.php';
@@ -111,6 +114,8 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	function getDisplayName() {
 		return __('plugins.pubIds.doi.displayName');
 	}
+
+	// END NEW //
 
 	/**
 	 * @copydoc Plugin::getDescription()
