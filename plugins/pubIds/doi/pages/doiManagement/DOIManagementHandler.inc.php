@@ -18,8 +18,50 @@ class DOIManagementHandler extends Handler
 {
 	public $_isBackendPage = true;
 
-	public function management(Array $args, Request $request) {
-		// TODO: Validation and authorization
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		parent::__construct();
+
+		$this->addRoleAssignment(
+			[ROLE_ID_MANAGER, ROLE_ID_SITE_ADMIN],
+			['index', 'management']
+		);
+	}
+
+	/**
+	 * @copydoc PKPHandler::authorize()
+	 */
+	public function authorize($request, &$args, $roleAssignments) {
+
+		import('lib.pkp.classes.security.authorization.PolicySet');
+		$rolePolicy = new PolicySet(COMBINING_PERMIT_OVERRIDES);
+
+		import('lib.pkp.classes.security.authorization.RoleBasedHandlerOperationPolicy');
+		foreach($roleAssignments as $role => $operations) {
+			$rolePolicy->addPolicy(new RoleBasedHandlerOperationPolicy($request, $role, $operations));
+		}
+		$this->addPolicy($rolePolicy);
+
+		return parent::authorize($request, $args, $roleAssignments);
+	}
+
+	/**
+	 * Displays DOI management index page
+	 * @param array $args
+	 * @param PKPRequest $request
+	 */
+	public function index($args, $request) {
+		$this->management($args, $request);
+	}
+
+	/**
+	 * Displays DOI management page
+	 * @param $args
+	 * @param $request
+	 */
+	public function management($args, $request) {
 		$this->setupTemplate($request);
 		$plugin = $this->_getPlugin();
 		$templateMgr = TemplateManager::getManager($request);

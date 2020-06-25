@@ -16,9 +16,9 @@
  */
 
 switch ($op) {
+	case 'index':
 	case 'management':
 		define('HANDLER_CLASS', 'DOIManagementHandler');
-		// TODO: What to import here??
 		import('plugins.pubIds.doi.pages.doiManagement.DOIManagementHandler');
 		break;
 }

@@ -55,6 +55,11 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	 */
 	function setupDoiManagementPage($hookname, $args) {
 		$request = Application::get()->getRequest();
+		$isEnabled = $this->getEnabled();
+		// TODO: Check if this should be done here
+		if ($isEnabled == false) {
+			return;
+		}
 
 		$router = $request->getRouter();
 		$handler = $router->getHandler();
@@ -64,10 +69,10 @@ class DOIPubIdPlugin extends PubIdPlugin {
 		$menu = $templateMgr->getState('menu');
 
 		// Add DOI management page to nav menu
-		if (in_array(ROLE_ID_MANAGER, $userRoles)) {
+		if ($isEnabled && array_intersect([ROLE_ID_SITE_ADMIN, ROLE_ID_MANAGER], $userRoles)) {
 			$doiLink = [
 				'name' => __('plugins.pubIds.doi.manager.displayName'),
-				'url' => $router->url($request,null, 'doiManagement', 'management'),
+				'url' => $router->url($request,null, 'doiManagement'),
 				'isCurrent' => $request->getRequestedPage() === 'doiManagement',
 			];
 
@@ -94,7 +99,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 		$page = $args[0];
 		if ($page !== 'doiManagement') return;
 		// Check the operation.
-		$availableOps = array('management');
+		$availableOps = array('index', 'management');
 		$op = $args[1];
 		if (!in_array($op, $availableOps)) return;
 		// The handler had been requested.
