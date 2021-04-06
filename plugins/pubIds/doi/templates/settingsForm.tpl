@@ -57,20 +57,21 @@
 			{fbvElement type="text" id="doiRepresentationSuffixPattern" value=$doiRepresentationSuffixPattern label="plugins.pubIds.doi.manager.settings.doiSuffixPattern.representations" maxlength="40" inline=true size=$fbvStyles.size.MEDIUM}
 		{/fbvFormSection}
 	{/fbvFormArea}
-	{fbvFormArea id="doiReassignFormArea" title="plugins.pubIds.doi.manager.settings.doiReassign"}
-		{fbvFormSection}
-			<div class="instruct">{translate key="plugins.pubIds.doi.manager.settings.doiReassign.description"}</div>
-			{include file="linkAction/linkAction.tpl" action=$clearPubIdsLinkAction contextId="doiSettingsForm"}
-		{/fbvFormSection}
-	{/fbvFormArea}
-	{if ($enableIssueDoi || $enablePublicationDoi || $enableRepresentationDoi) && $doiPrefix && $doiSuffix && $doiSuffix != 'customId' }
-		{fbvFormArea id="doiAssignJournalWideFormArea" title="plugins.pubIds.doi.manager.settings.doiAssignJournalWide"}
-			{fbvFormSection}
-				<div class="instruct">{translate key="plugins.pubIds.doi.manager.settings.doiAssignJournalWide.description"}</div>
-				{include file="linkAction/linkAction.tpl" action=$assignJournalWidePubIdsLinkAction contextId="doiSettingsForm"}
-			{/fbvFormSection}
-		{/fbvFormArea}
-	{/if}
+{*	TODO: Hide nuclear option for now *}
+{*	{fbvFormArea id="doiReassignFormArea" title="plugins.pubIds.doi.manager.settings.doiReassign"}*}
+{*		{fbvFormSection}*}
+{*			<div class="instruct">{translate key="plugins.pubIds.doi.manager.settings.doiReassign.description"}</div>*}
+{*			{include file="linkAction/linkAction.tpl" action=$clearPubIdsLinkAction contextId="doiSettingsForm"}*}
+{*		{/fbvFormSection}*}
+{*	{/fbvFormArea}*}
+{*	{if ($enableIssueDoi || $enablePublicationDoi || $enableRepresentationDoi) && $doiPrefix && $doiSuffix && $doiSuffix != 'customId' }*}
+{*		{fbvFormArea id="doiAssignJournalWideFormArea" title="plugins.pubIds.doi.manager.settings.doiAssignJournalWide"}*}
+{*			{fbvFormSection}*}
+{*				<div class="instruct">{translate key="plugins.pubIds.doi.manager.settings.doiAssignJournalWide.description"}</div>*}
+{*				{include file="linkAction/linkAction.tpl" action=$assignJournalWidePubIdsLinkAction contextId="doiSettingsForm"}*}
+{*			{/fbvFormSection}*}
+{*		{/fbvFormArea}*}
+{*	{/if}*}
 	{fbvFormButtons submitText="common.save"}
 </form>
 <p><span class="formRequired">{translate key="common.requiredField"}</span></p>

@@ -15,6 +15,8 @@
 
 import('classes.plugins.PubIdPlugin');
 
+use Illuminate\Database\Capsule\Manager as Capsule;
+
 class DOIPubIdPlugin extends PubIdPlugin {
 
 	/**
@@ -37,8 +39,570 @@ class DOIPubIdPlugin extends PubIdPlugin {
 			HookRegistry::register('Galley::getProperties::values', array($this, 'modifyObjectPropertyValues'));
 			HookRegistry::register('Form::config::before', array($this, 'addPublicationFormFields'));
 			HookRegistry::register('Form::config::before', array($this, 'addPublishFormNotice'));
+			// Automatic DOI minting on publication
+			HookRegistry::register('Publication::publish::before', array($this, 'mintPublicationDois'));
+			HookRegistry::register('IssueGridHandler::publishIssue', array($this, 'mintIssueDoi'));
+			// DOI management page
+			HookRegistry::register('TemplateManager::setupBackendPage', array($this, 'setupDoiManagementPage'));
+			HookRegistry::register('LoadHandler', array($this, 'callbackLoadHandler'));
+			$this->_registerTemplateResource(true);
+			// Submissions with Crossref status API
+			HookRegistry::register('API::submissions::params', array($this, 'modifyAPISubmissionsParams'));
+			HookRegistry::register('Submission::getMany::queryBuilder', array($this, 'modifySubmissionQueryBuilder'));
+			HookRegistry::register('Submission::getMany::queryObject', array($this, 'modifySubmissionQueryObject'));
+			// Issue with publication status, publications
+			HookRegistry::register('API::issues::params', array($this, 'modifyAPIIssuesParams'));
+			HookRegistry::register('Issue::getProperties::summaryProperties', array($this, 'modifyObjectProperties'));
+			HookRegistry::register('Issue::getProperties::values', array($this, 'modifyObjectPropertyValues'));
+			// Edit published DOIs API
+			HookRegistry::register('APIHandler::endpoints', array($this, 'modifySubmissionEndpoints'));
+			HookRegistry::register('PKPHandler::authorize', array($this, 'authorizeApiCalls'));
 		}
 		return $success;
+	}
+
+	/**
+	 * Automatically creates DOIs for publication and galleys on publication or scheduling.
+	 *
+	 * @param $hookName string 'Publication::publish::before'
+	 * @param $args array [
+	 * 		@option &$newPublication Publication
+	 * 		@option $publication Publication
+	 * 		@option $submission Submission
+	 * ]
+	 */
+	function mintPublicationDois($hookName, $args) {
+		$newPublication =& $args[0];
+		$submission = $args[2];
+
+		// Get and set publication DOI
+		$publicationPubId = $this->getPubId($newPublication);
+		// TODO: Check if DOI already set before setting data, especially for galleys that hit the DB
+		// One way around this: only do all this when published, not scheduled. Will need to check hook orders
+		$newPublication->setData('pub-id::' . $this->getPubIdType(), $publicationPubId);
+
+		// Get and set DOIs for all galleys associated with publication, if enabled
+		if ($this->getSetting($submission->getData('contextId'), 'enableRepresentationDoi')) {
+			$galleys = Services::get('galley')->getMany(['publicationIds' => $newPublication->getId()]);
+			$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
+
+			foreach ($galleys as $galley) {
+				$galleyPubId = $this->getPubId($galley);
+				$this->setStoredPubId($galley, $galleyPubId);
+				$articleGalleyDao->updateObject($galley);
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Automatically creates DOIs for Issue on publication.
+	 *
+	 * @param $hookName string 'IssueGridHandler::publishIssue'
+	 * @param $args array [
+	 * 		@option &$issue Issue
+	 * ]
+	 */
+	function mintIssueDoi($hookName, $args) {
+		$issue =& $args[0];
+
+		$pubId = $this->getPubId($issue);
+		$issue->setStoredPubId($this->getPubIdType(), $pubId);
+
+		// TODO: Temporary to only run once. PubId plugins registered multiple times. See https://github.com/pkp/pkp-lib/issues/5474#issuecomment-586952149
+		return true;
+	}
+
+	/**
+	 * Sets up backend DOI management page
+	 *
+	 * @param $hookname string Name of hook being called
+	 * @param $args array Hook arguments
+	 */
+	function setupDoiManagementPage($hookname, $args) {
+		$request = Application::get()->getRequest();
+		$isEnabled = $this->getEnabled();
+		// TODO: Check if this should be done here
+		if ($isEnabled == false) {
+			return;
+		}
+
+		$router = $request->getRouter();
+		$handler = $router->getHandler();
+		$userRoles = (array) $handler->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
+
+		$templateMgr = TemplateManager::getManager($request);
+		$menu = $templateMgr->getState('menu');
+
+		// Add DOI management page to nav menu
+		if ($isEnabled && array_intersect([ROLE_ID_SITE_ADMIN, ROLE_ID_MANAGER], $userRoles)) {
+			$doiLink = [
+				'name' => __('plugins.pubIds.doi.manager.displayName'),
+				'url' => $router->url($request, null, 'doiManagement'),
+				'isCurrent' => $request->getRequestedPage() === 'doiManagement',
+			];
+
+			// Assign DOI Mangement link to menu
+			$index = array_search('submissions', array_keys($menu));
+			if ($index === false || count($menu) <= ($index + 1)) {
+				$menu['doiManagement'] = $doiLink;
+			} else {
+				$menu = array_slice($menu, 0, $index + 1, true) +
+					['doiManagement' => $doiLink] +
+					array_slice($menu, $index + 1, null, true);
+			}
+
+			$templateMgr->setState(['menu' => $menu]);
+		}
+	}
+
+	/**
+	 * @see PKPPageRouter::route()
+	 * @param $hookName string
+	 * @param $args array [
+	 * 		@option string page
+	 * 		@option string op
+	 * 		@option string handler file
+	 * ]
+	 */
+	function callbackLoadHandler($hookname, $args) {
+		// Check the page.
+		$page = $args[0];
+		if ($page !== 'doiManagement') return;
+		// Check the operation.
+		$availableOps = array('index', 'management');
+		$op = $args[1];
+		if (!in_array($op, $availableOps)) return;
+		// The handler had been requested.
+		define('HANDLER_CLASS', 'DOIManagementHandler');
+		// Plugin name needed to fetch plugin from Handler
+		define('DOI_PLUGIN_NAME', $this->getName());
+		$handlerFile =& $args[2];
+		$handlerFile = $this->getPluginPath() . '/pages/doiManagement/' . 'DOIManagementHandler.inc.php';
+	}
+
+	/**
+	 * Collect and sanitize request params for submissions API endpoint
+	 *
+	 * @param $hookname string
+	 * @param $args array [
+	 * 		@option array $returnParams
+	 * 		@option SlimRequest $slimRequest
+	 * ]
+	 *
+	 * @return array
+	 */
+	public function modifyAPISubmissionsParams($hookname, $args) {
+		$returnParams =& $args[0];
+		$slimRequest = $args[1];
+		$requestParams = $slimRequest->getQueryParams();
+
+		foreach ($requestParams as $param => $value) {
+			switch ($param) {
+				case 'includeCrossrefStatus':
+					// TODO: Should not be loaded within DOI plugin
+					// Load crossref plugin to include crossref status in schemas
+					// Called here to ensure plugin loaded when schema is built
+					$crossrefPlugin = PluginRegistry::loadPlugin("importexport", "crossref");
+					break;
+
+				// Always convert crossrefStatus to array
+				case 'crossrefStatus':
+					if (is_string($value) && strpos($value, ',') > -1) {
+						$value = explode(',', $value);
+					} else if (!is_array($value)) {
+						$value = array($value);
+					}
+					// TODO: If using int, must map with array_map('intval', $value)
+					$returnParams[$param] = $value;
+					break;
+			}
+		}
+	}
+
+	/**
+	 * Run app-specific query builder methods for getMany
+	 *
+	 * @param $hookName string
+	 * @param $args array [
+	 * 		@option \APP\Services\QueryBuilders\SubmissionQueryBuilder
+	 * 		@option int Context ID
+	 * 		@option array Request args
+	 * ]
+	 *
+	 * @return \APP\Services\QueryBuilders\SubmissionQueryBuilder
+	 */
+	public function modifySubmissionQueryBuilder($hookname, $args) {
+		// This is for modifying the query builder, i.e. to add crossref::status as a filter
+		$submissionQB =& $args[0];
+		$queryArgs = $args[1];
+
+		if (!empty($queryArgs['crossrefStatus'])) {
+			$crossrefStatus = $queryArgs['crossrefStatus'];
+			$submissionQB->crossrefStatus = $crossrefStatus;
+		}
+	}
+
+	/**
+	 * Add app-specific query statements to the submission getMany query
+	 *
+	 * @param $hookName string
+	 * @param $args array [
+	 * 		@option object $queryObject
+	 * 		@option \APP\Services\QueryBuilders\SubmissionQueryBuilder $queryBuilder
+	 * ]
+	 *
+	 * @return object
+	 */
+	public function modifySubmissionQueryObject($hookname, $args) {
+		// Include desired query into the query objects, i.e. filter on crossref::status
+		$queryObject =& $args[0];
+		$queryBuilder = $args[1];
+
+		if (!empty($queryBuilder->crossrefStatus)) {
+			$crossrefStatus = $queryBuilder->crossrefStatus;
+
+			$queryObject->leftJoin('submission_settings as pss', function($queryObject) {
+				$queryObject->on('pss.submission_id', '=', 's.submission_id');
+				$queryObject->on('pss.setting_name', '=', Capsule::raw("'crossref::status'"));
+			});
+
+			// Items not deposited are null in DB, so first check for notDepsited filter and remove from array
+			$useNotDeposited = false;
+			if (in_array('notDeposited', $crossrefStatus)) {
+				$toRemove = array('notDeposited');
+				$crossrefStatus = array_values(array_diff($crossrefStatus, $toRemove));
+				$useNotDeposited = true;
+			}
+
+			// If the remaining crossrefStatus array is not empty,
+			// add it along with notDeposited null query if present
+			$queryObject->where(function($queryObject) use ($crossrefStatus, $useNotDeposited) {
+				if (!empty($crossrefStatus)) {
+					if ($useNotDeposited) {
+						$queryObject->whereNull('pss.setting_value');
+						$queryObject->orWhere(function($queryObject) use ($crossrefStatus) {
+							$queryObject->whereIn('pss.setting_value', $crossrefStatus);
+						});
+					} else {
+						$queryObject->whereIn('pss.setting_value', $crossrefStatus);
+					}
+				} else {
+					// Otherwise if notDeposited was the only filter in crossrefStatus,
+					// add the null query
+					if ($useNotDeposited) {
+						$queryObject->whereNull('pss.setting_value');
+					}
+				}
+			});
+		}
+	}
+
+	/**
+	 * Add custom endpoints to APIHandler
+	 *
+	 * @param $hookName string APIHandler::endpoints
+	 * @param $args array [
+	 * 		@option $endpoints array
+	 * 		@option $handler APIHandler
+	 * ]
+	 */
+	function modifySubmissionEndpoints($hookName, $args) {
+		$endpoints =& $args[0];
+		$handler = $args[1];
+
+		switch ($handler) {
+			case is_a($handler, 'PKPSubmissionHandler'):
+				array_unshift(
+					$endpoints['PUT'],
+					[
+						'pattern' => $handler->getEndpointPattern() . '/{submissionId}/publications/{publicationId}/doi',
+						'handler' => [$this, 'editPublicationDoi'],
+						'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR],
+					],
+					[
+						'pattern' => $handler->getEndpointPattern() . '/{submissionId}/publications/{publicationId}/galleys/{galleyId}/doi',
+						'handler' => [$this, 'editGalleyDoi'],
+						'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR],
+
+					]
+				);
+				break;
+			case is_a($handler, 'IssueHandler'):
+				$endpoints['PUT'] = array();
+				array_unshift(
+					$endpoints['PUT'],
+					[
+						'pattern' => $handler->getEndpointPattern() . '/{issueId}/doi',
+						'handler' => [$this, 'editIssueDoi'],
+						'roles' => [ROLE_ID_MANAGER, ROLE_ID_SUB_EDITOR],
+					]
+				);
+				break;
+		}
+
+	}
+
+	/**
+	 * Collect and sanitize request params for Issues API endpoint
+	 *
+	 * @param $hookName string
+	 * @param $args array [
+	 * 		@option array $returnParams
+	 * 		@option SlimRequest $slimRequest
+	 * ]
+	 *
+	 * @return array
+	 */
+	public function modifyAPIIssuesParams($hookName, $args) {
+		$returnParams =& $args[0];
+		$slimRequest = $args[1];
+		$requestParams = $slimRequest->getQueryParams();
+
+		foreach ($requestParams as $param => $value) {
+			switch ($param) {
+				case 'includeCrossrefStatus':
+					// Load crossref plugin to include crossref status in schemas
+					// Called here to ensure plugin loaded when schema is built
+					// TODO: Again, check how this should be handled. If making crossref generic plugin—unnecessary
+					$crossrefPlugin = PluginRegistry::loadPlugin("importexport", "crossref");
+					break;
+			}
+		}
+	}
+
+	/**
+	 * Add custom authorization to custom API calls
+	 *
+	 * @param $hookName string PKPHandler::authorize
+	 * @param $args
+	 */
+	function authorizeApiCalls($hookName, $args) {
+		$handler = $args[0];
+		$request = $args[1];
+		$handlerArgs =& $args[2];
+		$roleAssignments = $args[3];
+
+		// Check if submission, issue, or galley handler
+		if (!(is_a($handler, 'PKPSubmissionHandler') || is_a($handler, 'IssueHandler'))) {
+			return;
+		}
+
+		// Add relevant authorization policies
+		$routeName = $handler->getSlimRequest()->getAttribute('route')->getName();
+
+		switch ($routeName) {
+			case 'editPublicationDoi':
+			case 'editGalleyDoi':
+				import('lib.pkp.classes.security.authorization.SubmissionAccessPolicy');
+				$handler->addPolicy(new SubmissionAccessPolicy($request, $args, $roleAssignments));
+
+				import('lib.pkp.classes.security.authorization.PublicationWritePolicy');
+				$handler->addPolicy(new PublicationWritePolicy($request, $args, $roleAssignments));
+				break;
+			case 'editIssueDoi':
+				import('classes.security.authorization.OjsIssueRequiredPolicy');
+				$handler->addPolicy(new OjsIssueRequiredPolicy($request, $args));
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * Edit the published DOI for one of this submission's publications
+	 *
+	 * @param $slimRequest Request Slim request object
+	 * @param $response Response object
+	 * @param array $args arguments
+	 * @return Response
+	 */
+	function editPublicationDoi($slimRequest, $response, $args) {
+		$request = $this->getRequest();
+		$handler =  Application::get()->getRequest()->getRouter()->getHandler();
+
+		$submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
+		$currentUser = $request->getUser();
+		$publication = Services::get('publication')->get((int) $args['publicationId']);
+
+		if (!$publication) {
+			return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+		}
+
+		if ($submission->getId() !== $publication->getData('submissionId')) {
+			return $response->withStatus(403)->withJsonError('api.publications.403.submissionsDidNotMatch');
+		}
+
+		// Prevent users from editing publications if they do not have permission. Except for admins.
+		$userRoles = $handler->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
+		if (!in_array(ROLE_ID_SITE_ADMIN, $userRoles) && !Services::get('submission')->canEditPublication($submission->getId(), $currentUser->getId())) {
+			return $response->withStatus(403)->withJsonError('api.submissions.403.userCantEdit');
+		}
+
+		$params = $handler->convertStringsToSchema(SCHEMA_PUBLICATION, $slimRequest->getParsedBody());
+
+		// Only DOIs can be edited once Publication has been published
+		if (count($params) != 1 || !array_key_exists('pub-id::doi', $params)) {
+			return $response->withStatus(403)->withJsonError('api.publication.403.cantEditPublished');
+		}
+
+		$submissionContext = $request->getContext();
+		if (!$submissionContext || $submissionContext->getId() !== $submission->getData('contextId')) {
+			$submissionContext = Services::get('context')->get($submission->getData('contextId'));
+		}
+		$primaryLocale = $publication->getData('locale');
+		$allowedLocales = $submissionContext->getData('supportedSubmissionLocales');
+
+		// validatePublicationDoi() expects these params
+		$params['id'] = $args['publicationId'];
+		$params['submissionId'] = $args['submissionId'];
+
+		$errors = Services::get('publication')->validate(VALIDATE_ACTION_EDIT, $params, $allowedLocales, $primaryLocale);
+
+		if (!empty($errors)) {
+			return $response->withStatus(400)->withJson($errors);
+		}
+
+		$publication = Services::get('publication')->edit($publication, $params, $request);
+		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
+
+		$publicationProps = Services::get('publication')->getFullProperties(
+			$publication,
+			[
+				'request' => $request,
+				'userGroups' => $userGroupDao->getByContextId($submission->getData('contextId'))->toArray(),
+			]
+		);
+
+		return $response->withJson($publicationProps, 200);
+	}
+
+	/**
+	 * @param $slimRequest Request Slim request object
+	 * @param $response Response object
+	 * @param $args arguments
+	 * @return Response
+	 */
+	function editGalleyDoi($slimRequest, $response, $args) {
+		// Populate objects
+		$request = $this->getRequest();
+		$handler =  Application::get()->getRequest()->getRouter()->getHandler();
+
+		$submission = $handler->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
+		$currentUser = $request->getUser();
+		$publication = Services::get('publication')->get((int) $args['publicationId']);
+		$galley = Services::get('galley')->get((int) $args['galleyId']);
+
+		// Check for reasons to reject the request
+		if (!$galley) {
+			return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+		}
+
+		if ($submission->getId() !== $publication->getData('submissionId')) {
+			return $response->withStatus(403)->withJsonError('api.publications.403.submissionsDidNotMatch');
+		}
+
+		if ($publication->getId() !== $galley->getData('publicationId')) {
+			return $response->withStatus(403)->withJsonError('api.galley.403.submissionsDidNotMatch');
+		}
+
+		// Prevent users from editing galleys if they do not have permission. Except for admins.
+		$userRoles = $handler->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
+		if (!in_array(ROLE_ID_MANAGER, $userRoles) && !Services::get('submission')->canEditPublication($submission->getId(), $currentUser->getId())) {
+			return $response->withStatus(403)->withJsonError('api.submissions.403.userCantEdit');
+		}
+
+		// Make, validate, and save change
+		$params = $handler->convertStringsToSchema(SCHEMA_GALLEY, $slimRequest->getParsedBody());
+
+		// Only DOIs can be edited once Publication has been published
+		if (count($params) != 1 || !array_key_exists('pub-id::doi', $params)) {
+			return $response->withStatus(403)->withJsonError('api.galley.403.cantEditPublished');
+		}
+
+		$submissionContext = $request->getContext();
+		if (!$submissionContext || $submissionContext->getId() !== $submission->getData('contextId')) {
+			$submissionContext = Services::get('context')->get($submission->getData('contextId'));
+		}
+		$primaryLocale = $publication->getData('locale');
+		$allowedLocales = $submissionContext->getData('supportedSubmissionLocales');
+
+		$errors = Services::get('galley')->validate(VALIDATE_ACTION_EDIT, $params, $allowedLocales, $primaryLocale);
+
+		if (!empty($errors)) {
+			return $response->withStatus(400)->withJson($errors);
+		}
+
+		// Get props
+		$galley = Services::get('galley')->edit($galley, $params, $request);
+		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
+
+		// Return response
+		$galleyProps = Services::get('galley')->getFullProperties(
+			$galley,
+			[
+				'request' => $request,
+				'userGroups' => $userGroupDao->getByContextId($submission->getData('contextId'))->toArray(),
+			]
+		);
+
+		return $response->withJson($galleyProps, 200);
+
+	}
+
+	/**
+	 * Edit the published DOI for an issue
+	 *
+	 * @param $slimRequest Request Slim request object
+	 * @param $response Response object
+	 * @param array $args arguments
+	 * @return Response
+	 */
+	function editIssueDoi($slimRequest, $response, $args) {
+		$request = $this->getRequest();
+		$handler =  Application::get()->getRequest()->getRouter()->getHandler();
+
+		$issue = $handler->getAuthorizedContextObject(ASSOC_TYPE_ISSUE);
+
+		if (!$issue) {
+			return $response->withStatus(404)->withJsonError('api.404.resourceNotFound');
+		}
+
+		// Prevent users from editing publications if they do not have permission. Except for admins.
+		$userRoles = $handler->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
+		if (!in_array(ROLE_ID_SITE_ADMIN, $userRoles)) {
+			return $response->withStatus(403)->withJsonError('api.submissions.403.userCantEdit');
+		}
+
+		$params = $handler->convertStringsToSchema(SCHEMA_ISSUE, $slimRequest->getParsedBody());
+
+		// Only DOIs can be edited once Issue has been published
+		if (count($params) != 1 || !array_key_exists('pub-id::doi', $params)) {
+			return $response->withStatus(403)->withJsonError('api.issue.403.canEditPublishedDoi');
+		}
+
+		if ($this->validatePubId($params['pub-id::doi']) == false) {
+			return $response->withStatus(400)->withJsonError('api.issue.400.invalidDoi');
+		}
+
+		// Save changes
+		$issueDao = DAORegistry::getDAO('IssueDAO');
+		$issueDao->changePubId($issue->getId(), $this->getPubIdType(), $params['pub-id::doi']);
+
+		// Send props
+		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
+
+		$issueProps = Services::get('issue')->getFullProperties(
+			$issue,
+			[
+				'request' => $request,
+				'userGroups' => $userGroupDao->getByContextId($issue->getData('contextId'))->toArray(),
+				'slimRequest' => $slimRequest
+			],
+		);
+
+		return $response->withJson($issueProps, 200);
 	}
 
 	//
@@ -94,7 +658,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	 * @copydoc PKPPubIdPlugin::getResolvingURL()
 	 */
 	function getResolvingURL($contextId, $pubId) {
-		return 'https://doi.org/'.$this->_doiURLEncode($pubId);
+		return 'https://doi.org/' . $this->_doiURLEncode($pubId);
 	}
 
 	/**
@@ -108,7 +672,15 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	 * @copydoc PKPPubIdPlugin::getPubIdAssignFile()
 	 */
 	function getPubIdAssignFile() {
-		return $this->getTemplateResource('doiAssign.tpl');
+		return $this->getTemplateResource('doiAssignInfo.tpl');
+	}
+
+	function getDoiManagementLink() {
+		$dispatcher = Application::get()->getDispatcher();
+		$request = Application::get()->getRequest();
+
+		return $dispatcher->url($request, ROUTE_PAGE, $request->getcontext()->getPath(), 'doiManagement', 'management');
+
 	}
 
 	/**
@@ -195,7 +767,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	 * @copydoc PKPPubIdPlugin::getSuffixPatternsFieldNames()
 	 */
 	function getSuffixPatternsFieldNames() {
-		return  array(
+		return array(
 			'Issue' => 'doiIssueSuffixPattern',
 			'Publication' => 'doiPublicationSuffixPattern',
 			'Representation' => 'doiRepresentationSuffixPattern'
@@ -266,12 +838,13 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	 */
 	/**
 	 * Encode DOI according to ANSI/NISO Z39.84-2005, Appendix E.
+	 *
 	 * @param $pubId string
 	 * @return string
 	 */
 	function _doiURLEncode($pubId) {
-		$search = array ('%', '"', '#', ' ', '<', '>', '{');
-		$replace = array ('%25', '%22', '%23', '%20', '%3c', '%3e', '%7b');
+		$search = array('%', '"', '#', ' ', '<', '>', '{');
+		$replace = array('%25', '%22', '%23', '%20', '%3c', '%3e', '%7b');
 		$pubId = str_replace($search, $replace, $pubId);
 		return $pubId;
 	}
@@ -328,8 +901,23 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	 */
 	public function modifyObjectProperties($hookName, $args) {
 		$props =& $args[0];
+		$object = $args[1];
+		$propertyArgs = $args[2];
 
 		$props[] = 'pub-id::doi';
+
+		$doiManagementArgs = $propertyArgs['doiManagementArgs'];
+
+		// Used in Issue DOI management
+		if (get_class($object) == 'Issue' && (
+			(isset($_REQUEST['includeCrossrefStatus']) && $_REQUEST['includeCrossrefStatus'] == true))
+			|| isset($doiManagementArgs)
+		) {
+			$props[] = 'isPublished';
+			$props[] = 'articles';
+		}
+
+
 	}
 
 	/**
@@ -364,6 +952,11 @@ class DOIPubIdPlugin extends PubIdPlugin {
 			$pubId = $this->getPubId($object);
 			$values['pub-id::doi'] = $pubId ? $pubId : null;
 		}
+
+		// Used in Issue DOI management
+		if (get_class($object) == 'Issue' && in_array('isPublished', $props)) {
+			$values['isPublished'] = (bool) $object->getPublished();
+		}
 	}
 
 	/**
@@ -388,7 +981,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 		$pattern = '';
 		if ($suffixType === 'default') {
 			$pattern = '%j.v%vi%i.%a';
-		} elseif ($suffixType === 'pattern') {
+		} else if ($suffixType === 'pattern') {
 			$pattern = $this->getSetting($form->submissionContext->getId(), 'doiPublicationSuffixPattern');
 		}
 
@@ -427,7 +1020,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 			}
 			if ($suffixType === 'default') {
 				$fieldData['missingPartsLabel'] = __('plugins.pubIds.doi.editor.missingIssue');
-			} else  {
+			} else {
 				$fieldData['missingPartsLabel'] = __('plugins.pubIds.doi.editor.missingParts');
 			}
 			$form->addField(new \PKP\components\forms\FieldPubId('pub-id::doi', $fieldData));
@@ -454,12 +1047,17 @@ class DOIPubIdPlugin extends PubIdPlugin {
 		if (!$publicationDoiEnabled && !$galleyDoiEnabled) {
 			return;
 
-		// Use a simplified view when only assigning to the publication
+			// Use a simplified view when only assigning to the publication
 		} else if (!$galleyDoiEnabled) {
 			if ($form->publication->getData('pub-id::doi')) {
 				$msg = __('plugins.pubIds.doi.editor.preview.publication', ['doi' => $form->publication->getData('pub-id::doi')]);
 			} else {
-				$msg = '<div class="pkpNotification pkpNotification--warning">' . $warningIconHtml . __('plugins.pubIds.doi.editor.preview.publication.none') . '</div>';
+				$toBeAssignedPubId = $this->getpubId($form->publication);
+				if ($toBeAssignedPubId != null) {
+					$msg = __('plugins.pubIds.doi.editor.preview.publication', ['doi' => $toBeAssignedPubId]);
+				} else {
+					$msg = '<div class="pkpNotification pkpNotification--warning">' . $warningIconHtml . __('plugins.pubIds.doi.editor.preview.publication.none') . '</div>';
+				}
 			}
 			$form->addField(new \PKP\components\forms\FieldHTML('doi', [
 				'description' => $msg,
@@ -467,14 +1065,19 @@ class DOIPubIdPlugin extends PubIdPlugin {
 			]));
 			return;
 
-		// Show a table if more than one DOI is going to be created
+			// Show a table if more than one DOI is going to be created
 		} else {
 			$doiTableRows = [];
 			if ($publicationDoiEnabled) {
 				if ($form->publication->getData('pub-id::doi')) {
 					$doiTableRows[] = [$form->publication->getData('pub-id::doi'), 'Publication'];
 				} else {
-					$doiTableRows[] = [$warningIconHtml . __('submission.status.unassigned'), 'Publication'];
+					$toBeAssignedPubId = $this->getpubId($form->publication);
+					if ($toBeAssignedPubId != null) {
+						$doiTableRows[] = [$toBeAssignedPubId, 'Publication'];
+					} else {
+						$doiTableRows[] = [$warningIconHtml . __('submission.status.unassigned'), 'Publication'];
+					}
 				}
 			}
 			if ($galleyDoiEnabled) {
@@ -482,7 +1085,12 @@ class DOIPubIdPlugin extends PubIdPlugin {
 					if ($galley->getStoredPubId('doi')) {
 						$doiTableRows[] = [$galley->getStoredPubId('doi'), __('plugins.pubIds.doi.editor.preview.galleys', ['galleyLabel' => $galley->getGalleyLabel()])];
 					} else {
-						$doiTableRows[] = [$warningIconHtml . __('submission.status.unassigned'),__('plugins.pubIds.doi.editor.preview.galleys', ['galleyLabel' => $galley->getGalleyLabel()])];
+						$toBeAssignedPubId = $this->getpubId($galley);
+						if ($toBeAssignedPubId != null) {
+							$doiTableRows[] = [$toBeAssignedPubId, __('plugins.pubIds.doi.editor.preview.galleys', ['galleyLabel' => $galley->getGalleyLabel()])];
+						} else {
+							$doiTableRows[] = [$warningIconHtml . __('submission.status.unassigned'), __('plugins.pubIds.doi.editor.preview.galleys', ['galleyLabel' => $galley->getGalleyLabel()])];
+						}
 					}
 				}
 			}

@@ -54,16 +54,17 @@
 {if $pubObjectType == 'Issue'}
 	{assign var=enablePublicationDoi value=$pubIdPlugin->getSetting($currentContext->getId(), "enablePublicationDoi")}
 	{assign var=enableRepresentationDoi value=$pubIdPlugin->getSetting($currentContext->getId(), "enableRepresentationDoi")}
-	{if $enablePublicationDoi || $enableRepresentationDoi}
-		{if !$formArea}
-			{assign var="formAreaTitle" value="plugins.pubIds.doi.editor.doi"}
-		{else}
-			{assign var="formAreaTitle" value=""}
-		{/if}
-		{fbvFormArea id="pubIdDOIFormArea" class="border" title=$formAreaTitle}
-			{fbvFormSection list="true" description="plugins.pubIds.doi.editor.clearIssueObjectsDoi.description"}
-				{include file="linkAction/linkAction.tpl" action=$clearIssueObjectsPubIdsLinkActionDoi contextId="publicIdentifiersForm"}
-			{/fbvFormSection}
-		{/fbvFormArea}
-	{/if}
+{*	TODO: Hide nuclear option for now *}
+{*	{if $enablePublicationDoi || $enableRepresentationDoi}*}
+{*		{if !$formArea}*}
+{*			{assign var="formAreaTitle" value="plugins.pubIds.doi.editor.doi"}*}
+{*		{else}*}
+{*			{assign var="formAreaTitle" value=""}*}
+{*		{/if}*}
+{*		{fbvFormArea id="pubIdDOIFormArea" class="border" title=$formAreaTitle}*}
+{*			{fbvFormSection list="true" description="plugins.pubIds.doi.editor.clearIssueObjectsDoi.description"}*}
+{*				{include file="linkAction/linkAction.tpl" action=$clearIssueObjectsPubIdsLinkActionDoi contextId="publicIdentifiersForm"}*}
+{*			{/fbvFormSection}*}
+{*		{/fbvFormArea}*}
+{*	{/if}*}
 {/if}

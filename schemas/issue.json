@@ -79,6 +79,10 @@
 			"type": "string",
 			"apiSummary": true
 		},
+	  	"published": {
+		  "type": "boolean",
+		  "apiSummary": true
+		},
 		"publishedUrl": {
 			"type": "string",
 			"apiSummary": true,
