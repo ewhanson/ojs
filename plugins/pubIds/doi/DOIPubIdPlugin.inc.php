@@ -204,7 +204,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 					// TODO: Should not be loaded within DOI plugin
 					// Load crossref plugin to include crossref status in schemas
 					// Called here to ensure plugin loaded when schema is built
-					$crossrefPlugin = PluginRegistry::loadPlugin("importexport", "crossref");
+//					$crossrefPlugin = PluginRegistry::loadPlugin("importexport", "crossref");
 					break;
 
 				// Always convert crossrefStatus to array
@@ -366,7 +366,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 					// Load crossref plugin to include crossref status in schemas
 					// Called here to ensure plugin loaded when schema is built
 					// TODO: Again, check how this should be handled. If making crossref generic plugin—unnecessary
-					$crossrefPlugin = PluginRegistry::loadPlugin("importexport", "crossref");
+//					$crossrefPlugin = PluginRegistry::loadPlugin("importexport", "crossref");
 					break;
 			}
 		}

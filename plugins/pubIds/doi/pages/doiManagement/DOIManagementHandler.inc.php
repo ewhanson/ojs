@@ -82,7 +82,7 @@ class DOIManagementHandler extends Handler {
 		$templateMgr = TemplateManager::getManager($request);
 
 		// TODO: Should not be used here. For testing crossref status fetching
-		PluginRegistry::loadPlugin("importexport", "crossref");
+//		PluginRegistry::loadPlugin("importexport", "crossref");
 
 		$getParams = [
 			'includeCrossrefStatus' => $this->_getCrossrefPluginStatus() ? 'true' : 'false',

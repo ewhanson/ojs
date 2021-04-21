@@ -31,6 +31,11 @@ define('EXPORT_CONFIG_ERROR_SETTINGS', 0x02);
 
 
 abstract class PubObjectsExportPlugin extends ImportExportPlugin {
+	const EXPORT_ACTION_EXPORT = 'export';
+	const EXPORT_ACTION_MARKREGISTERED = 'markRegistered';
+	const EXPORT_ACTION_DEPOSIT = 'deposit';
+
+
 	/** @var PubObjectCache */
 	var $_cache;
 
@@ -55,7 +60,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 
 		AppLocale::requireComponents(LOCALE_COMPONENT_APP_MANAGER);
 		$this->addLocaleData();
-		
+
 		HookRegistry::register('AcronPlugin::parseCronTab', array($this, 'callbackParseCronTab'));
 		foreach ($this->_getDAOs() as $dao) {
 			if ($dao instanceof SchemaDAO) {
@@ -144,44 +149,61 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 			case 'exportSubmissions':
 			case 'exportIssues':
 			case 'exportRepresentations':
-				$selectedSubmissions = (array) $request->getUserVar('selectedSubmissions');
-				$selectedIssues = (array) $request->getUserVar('selectedIssues');
-				$selectedRepresentations = (array) $request->getUserVar('selectedRepresentations');
-				$tab = (string) $request->getUserVar('tab');
-				$noValidation = $request->getUserVar('validation') ? false : true;
-
-				if (empty($selectedSubmissions) && empty($selectedIssues) && empty($selectedRepresentations)) {
-					fatalError(__('plugins.importexport.common.error.noObjectsSelected'));
-				}
-				if (!empty($selectedSubmissions)) {
-					$objects = $this->getPublishedSubmissions($selectedSubmissions, $context);
-					$filter = $this->getSubmissionFilter();
-					$objectsFileNamePart = 'articles';
-				} elseif (!empty($selectedIssues)) {
-					$objects = $this->getPublishedIssues($selectedIssues, $context);
-					$filter = $this->getIssueFilter();
-					$objectsFileNamePart = 'issues';
-				} elseif (!empty($selectedRepresentations)) {
-					$objects = $this->getArticleGalleys($selectedRepresentations);
-					$filter = $this->getRepresentationFilter();
-					$objectsFileNamePart = 'galleys';
-				}
-
-				// Execute export action
-				$this->executeExportAction($request, $objects, $filter, $tab, $objectsFileNamePart, $noValidation);
+				$this->prepareAndExportPubObjects($request, $context);
 		}
 	}
 
 	/**
+	 * Gathers relevant pub objects and runs export action
+	 *
+	 * @param $request
+	 * @param $context
+	 * @param $args array Optional args for passing in submissionIds from external API calls
+	 */
+	function prepareAndExportPubObjects($request, $context, $args = []) {
+		$selectedSubmissions = (array) $request->getUserVar('selectedSubmissions');
+		$selectedIssues = (array) $request->getUserVar('selectedIssues');
+		$selectedRepresentations = (array) $request->getUserVar('selectedRepresentations');
+		$tab = (string) $request->getUserVar('tab');
+		$noValidation = $request->getUserVar('validation') ? false : true;
+
+		if (!empty($args['submissionIds'])) {
+			$selectedSubmissions = (array) $args['submissionIds'];
+		}
+
+		if (empty($selectedSubmissions) && empty($selectedIssues) && empty($selectedRepresentations)) {
+			fatalError(__('plugins.importexport.common.error.noObjectsSelected'));
+		}
+		if (!empty($selectedSubmissions)) {
+			$objects = $this->getPublishedSubmissions($selectedSubmissions, $context);
+			$filter = $this->getSubmissionFilter();
+			$objectsFileNamePart = 'articles';
+		} elseif (!empty($selectedIssues)) {
+			$objects = $this->getPublishedIssues($selectedIssues, $context);
+			$filter = $this->getIssueFilter();
+			$objectsFileNamePart = 'issues';
+		} elseif (!empty($selectedRepresentations)) {
+			$objects = $this->getArticleGalleys($selectedRepresentations);
+			$filter = $this->getRepresentationFilter();
+			$objectsFileNamePart = 'galleys';
+		}
+
+		// Execute export action
+		$this->executeExportAction($request, $objects, $filter, $tab, $objectsFileNamePart, $noValidation);
+	}
+
+	/**
 	 * Execute export action.
+	 *
 	 * @param $request Request
 	 * @param $objects array Array of objects to be exported
 	 * @param $filter string Filter to use
 	 * @param $tab string Tab to return to
 	 * @param $objectsFileNamePart string Export file name part for this kind of objects
 	 * @param $noValidation boolean If set to true no XML validation will be done
+	 * @param $shouldRedirect boolean If set to true, will redirect to `$tab`. Should be true if executed within an ImportExportPlugin.
 	 */
-	function executeExportAction($request, $objects, $filter, $tab, $objectsFileNamePart, $noValidation = null) {
+	function executeExportAction($request, $objects, $filter, $tab, $objectsFileNamePart, $noValidation = null, $shouldRedirect = true) {
 		$context = $request->getContext();
 		$path = array('plugin', $this->getName());
 		if ($request->getUserVar(EXPORT_ACTION_EXPORT)) {
@@ -194,7 +216,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 
 			// Get the XML
 			$exportXml = $this->exportXML($objects, $filter, $context, $noValidation);
-			
+
 			if ($onlyValidateExport) {
 				if (isset($exportXml)) {
 					$this->_sendNotification(
@@ -210,7 +232,9 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 					);
 				}
 
-				$request->redirect(null, null, null, $path, null, $tab);
+				if ($shouldRedirect) {
+					$request->redirect(null, null, null, $path, null, $tab);
+				}
 			} else {
 				import('lib.pkp.classes.file.FileManager');
 				$fileManager = new FileManager();
@@ -253,12 +277,16 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 			}
 			// Remove all temporary files.
 			$fileManager->deleteByPath($exportFileName);
-			// redirect back to the right tab
-			$request->redirect(null, null, null, $path, null, $tab);
+			if ($shouldRedirect) {
+				// redirect back to the right tab
+				$request->redirect(null, null, null, $path, null, $tab);
+			}
 		} elseif ($request->getUserVar(EXPORT_ACTION_MARKREGISTERED)) {
 			$this->markRegistered($context, $objects);
-			// redirect back to the right tab
-			$request->redirect(null, null, null, $path, null, $tab);
+			if ($shouldRedirect) {
+				// redirect back to the right tab
+				$request->redirect(null, null, null, $path, null, $tab);
+			}
 		} else {
 			$dispatcher = $request->getDispatcher();
 			$dispatcher->handle404();
@@ -440,7 +468,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 		foreach ($this->_getObjectAdditionalSettings() as $fieldName) {
 			$additionalFields[] = $fieldName;
 		}
-		
+
 		return false;
 	}
 
