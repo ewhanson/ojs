@@ -29,5 +29,7 @@
 			{capture assign=doiSettingsGridUrl}{url router=$smarty.const.ROUTE_COMPONENT component="grid.settings.plugins.settingsPluginGridHandler" op="manage" plugin="doipubidplugin" category="pubIds" verb="" escape=false}{/capture}
 			{load_url_in_div id="doiSettingsGridUrl" url=$doiSettingsGridUrl}
 		</tab>
+
+		{call_hook name="Template::doiManagement"}
 	</tabs>
 {/block}
