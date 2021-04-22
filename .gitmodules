@@ -53,3 +53,6 @@
 [submodule "plugins/importexport/crossref"]
 	path = plugins/importexport/crossref
 	url = https://github.com/pkp/crossref-ojs.git
+[submodule "plugins/generic/crossref"]
+	path = plugins/generic/crossref
+	url = https://github.com/ewhanson/crossref-ojs.git

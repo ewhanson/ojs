@@ -66,6 +66,8 @@ class ExportPublishedSubmissionsListGridHandler extends GridHandler {
 			LOCALE_COMPONENT_APP_MANAGER
 		);
 
+		// TODO: Remove
+		$plugins = PluginRegistry::getPlugins();
 		$pluginCategory = $request->getUserVar('category');
 		$pluginPathName = $request->getUserVar('plugin');
 		$this->_plugin = PluginRegistry::loadPlugin($pluginCategory, $pluginPathName);

@@ -65,7 +65,7 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel {
 			$issueAutosuggestField = new FieldSelectIssues('issueIds', [
 				'label' => __('issue.issues'),
 				'value' => [],
-				'apiUrl' => $request->getDispatcher()->url($request, ROUTE_API, $request->getContext()->getPath(), 'issues'),
+				'apiUrl' => $request->getDispatcher()->url($request, PKPApplication::ROUTE_API, $request->getContext()->getPath(), 'issues'),
 			]);
 			$config['issueFilter'] = [
 				'filters' => [
