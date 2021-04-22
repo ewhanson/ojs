@@ -384,8 +384,12 @@ class DOIPubIdPlugin extends PubIdPlugin {
 		$handlerArgs =& $args[2];
 		$roleAssignments = $args[3];
 
+		$isAPIHandler = is_a($handler, 'APIHandler');
+		$isPKPSubmissionHandler = is_a($handler, 'PKPSubmissionHandler');
+		$isIssueHandler = is_a($handler, 'IssueHandler');
+
 		// Check if submission, issue, or galley handler
-		if (!(is_a($handler, 'PKPSubmissionHandler') || is_a($handler, 'IssueHandler'))) {
+		if ((!$isPKPSubmissionHandler || !$isIssueHandler) && !$isAPIHandler) {
 			return;
 		}
 
