@@ -61,13 +61,72 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel {
 		$config['itemMax'] = $this->itemsMax;
 		$config['hasDOIs'] = $this->enabledPublishingObjects;
 
+		if ($this->isSubmission) {
+			$config['filters'][] = [
+				'heading' => 'Publication Status',
+				'filters' => [
+					[
+						'title' => 'Published',
+						'param' => 'status',
+						'value' => (string) PKPSubmission::STATUS_PUBLISHED
+					],
+					[
+						'title' => 'Unpublished',
+						'param' => 'status',
+						'value' => PKPSubmission::STATUS_QUEUED . ', ' . PKPSubmission::STATUS_SCHEDULED
+					]
+				]
+			];
+			$config['filters'][] = [
+				'heading' => 'Crossref Deposit Status',
+				'filters' => [
+					[
+						'title' => 'Not deposited',
+						'param' => 'crossrefStatus',
+						'value' => 'notDeposited'
+					],
+					[
+						'title' => 'Active',
+						'param' => 'crossrefStatus',
+						'value' => 'registered'
+					],
+					[
+						'title' => 'Failed',
+						'param' => 'crossrefStatus',
+						'value' => 'failed'
+					],
+					[
+						'title' => 'Marked Active',
+						'param' => 'crossrefStatus',
+						'value' => 'markedRegistered'
+					],
+				]
+			];
+		} else {
+			$config['filters'][] = [
+				'heading' => 'Publication Status',
+				'filters' => [
+					[
+						'title' => 'Published',
+						'param' => 'isPublished',
+						'value' => '1'
+					],
+					[
+						'title' => 'Published',
+						'param' => 'isPublished',
+						'value' => '0'
+					],
+				]
+			];
+		}
+
 		if ($this->includeIssuesFilter) {
 			$issueAutosuggestField = new FieldSelectIssues('issueIds', [
 				'label' => __('issue.issues'),
 				'value' => [],
 				'apiUrl' => $request->getDispatcher()->url($request, PKPApplication::ROUTE_API, $request->getContext()->getPath(), 'issues'),
 			]);
-			$config['issueFilter'] = [
+			$config['filters'][] = [
 				'filters' => [
 					[
 						'title' => __('issue.issues'),
