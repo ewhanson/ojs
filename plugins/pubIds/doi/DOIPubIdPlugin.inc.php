@@ -73,7 +73,8 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	 */
 	function mintPublicationDois($hookName, $args) {
 		$newPublication =& $args[0];
-		$submission = $args[2];
+		$request = Application::get()->getRequest();
+		$context = $request->getContext();
 
 		// Get and set publication DOI
 		$publicationPubId = $this->getPubId($newPublication);
@@ -82,7 +83,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 		$newPublication->setData('pub-id::' . $this->getPubIdType(), $publicationPubId);
 
 		// Get and set DOIs for all galleys associated with publication, if enabled
-		if ($this->getSetting($submission->getData('contextId'), 'enableRepresentationDoi')) {
+		if ($this->getSetting($context->getId(), 'enableRepresentationDoi')) {
 			$galleys = Services::get('galley')->getMany(['publicationIds' => $newPublication->getId()]);
 			$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
 

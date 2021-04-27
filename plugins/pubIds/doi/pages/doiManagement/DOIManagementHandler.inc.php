@@ -75,9 +75,15 @@ class DOIManagementHandler extends Handler {
 		$plugin = $this->_getPlugin();
 		$context = $request->getContext();
 		$contextId = $context->getId();
+
 		$issueDoisEnabled = $plugin->getSetting($contextId, self::ENABLE_ISSUE_DOI);
 		$publicationDoisEnabled = $plugin->getSetting($contextId, self::ENABLE_PUBLICATION_DOI);
 		$representationDoisEnabled = $plugin->getSetting($contextId, self::ENABLE_REPRESENTATION_DOI);
+
+		$enabledPublishingObjects = [];
+		if ($issueDoisEnabled) array_push($enabledPublishingObjects, 'issues');
+		if ($publicationDoisEnabled) array_push($enabledPublishingObjects, 'publications');
+		if ($representationDoisEnabled) array_push($enabledPublishingObjects, 'representations');
 
 		$templateMgr = TemplateManager::getManager($request);
 
@@ -93,11 +99,7 @@ class DOIManagementHandler extends Handler {
 			'getParams' => $getParams,
 			'lazyLoad' => true,
 			'crossrefPluginEnabled' => $this->_getCrossrefPluginStatus(),
-			'enabledPublishingObjects' => [
-				'issues' => $issueDoisEnabled,
-				'publications' => $publicationDoisEnabled,
-				'representations' => $representationDoisEnabled
-			],
+			'enabledPublishingObjects' => $enabledPublishingObjects,
 		];
 
 		$stateComponents = array();

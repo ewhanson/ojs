@@ -59,7 +59,7 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel {
 		$config['getParams'] = $this->getParams;
 		$config['lazyLoad'] = $this->lazyLoad;
 		$config['itemMax'] = $this->itemsMax;
-		$config['enabledPublishingObjects'] = $this->enabledPublishingObjects;
+		$config['hasDOIs'] = $this->enabledPublishingObjects;
 
 		if ($this->includeIssuesFilter) {
 			$issueAutosuggestField = new FieldSelectIssues('issueIds', [
