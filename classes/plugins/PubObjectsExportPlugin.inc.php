@@ -890,14 +890,14 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
             DAORegistry::getDAO('IssueDAO'),
         ];
     }
-}
 
-	/**
-	 * @see ImportExportPlugin::getAppSpecificDeployment
-	 */
-	function getAppSpecificDeployment($context, $user) {
-		throw new BadMethodCallException();
-	}
+    /**
+     * @see ImportExportPlugin::getAppSpecificDeployment
+     */
+    public function getAppSpecificDeployment($context, $user)
+    {
+        throw new BadMethodCallException();
+    }
 }
 
 if (!PKP_STRICT_MODE) {
