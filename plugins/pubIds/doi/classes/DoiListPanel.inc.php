@@ -14,6 +14,7 @@
  */
 
 use APP\components\forms\FieldSelectIssues;
+use PKP\submission\PKPSubmission;
 
 class DoiListPanel extends PKP\components\listPanels\ListPanel
 {
