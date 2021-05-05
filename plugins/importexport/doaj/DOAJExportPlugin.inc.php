@@ -215,4 +215,28 @@ class DOAJExportPlugin extends PubObjectsExportPlugin
         $exportFilter->setDeployment($exportDeployment);
         return $exportFilter->execute($object, true);
     }
+
+    /**
+     * @see ImportExportPlugin::getImportFilter
+     */
+    public function getImportFilter($xmlFile)
+    {
+        throw new BadMethodCallException();
+    }
+
+    /**
+     * @see ImportExportPlugin::getExportFilter
+     */
+    public function getExportFilter($exportType)
+    {
+        throw new BadMethodCallException();
+    }
+
+    /**
+     * @see ImportExportPlugin::getAppSpecificDeployment
+     */
+    public function getAppSpecificDeployment($context, $user)
+    {
+        throw new BadMethodCallException();
+    }
 }

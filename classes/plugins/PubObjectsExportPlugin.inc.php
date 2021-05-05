@@ -896,7 +896,8 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
     /**
      * @see ImportExportPlugin::getAppSpecificDeployment
      */
-    function getAppSpecificDeployment($context, $user) {
+    public function getAppSpecificDeployment($context, $user)
+    {
         throw new BadMethodCallException();
     }
 }
