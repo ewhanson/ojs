@@ -47,4 +47,13 @@
 		<dropindex table="citations" index="citations_submission_seq" />
 		<rename table="citations" column="submission_id" to="publication_id" />
 	</sql>
+
+	<!--
+	Necessary to allow longer supplementary files titles to be added as a label when
+	they are converted to public galleys. This happens with previous upgrades from 2.4.x
+	to other versions of OJS 3, but does not otherwise happen with the 2.4.x to 3.2.x upgrade.
+ -->
+	<sql>
+		<query>ALTER TABLE submission_galleys MODIFY COLUMN label VARCHAR(255);</query>
+	</sql>
 </data>

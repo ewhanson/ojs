@@ -1435,10 +1435,10 @@ class Upgrade extends Installer {
 					$articleGalleyDao->update(
 						'INSERT INTO submission_galleys (locale, submission_id, file_id, label) VALUES (?, ?, ?, ?)',
 						array(
-							$article->getLocale(),
+							empty($article->getLocale()) ? AppLocale::getPrimaryLocale() : $article->getLocale(),
 							$article->getId(),
 							$submissionFile->getFileId(),
-							$submissionFile->getName($article->getLocale())
+							$submissionFile->getName(empty($article->getLocale()) ? AppLocale::getPrimaryLocale() : $article->getLocale())
 						)
 					);
 					$galleyId = $articleGalleyDao->getInsertId();

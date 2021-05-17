@@ -143,6 +143,19 @@
 			)
 		</query>
 
+		<!--
+			Copy over updated submission_galleys table with supplementary files as galleys.
+			These are otherwise lost as these changes are added to submission_galleys but never
+			copied over to temp_submission_galleys.
+		-->
+
+		<!-- First remove temp table created in 3.2.0_preupdate_versioning -->
+		<drop table="temp_submission_galleys" />
+
+		<!-- Then recreate it with the updated submission_galleys table -->
+		<query>CREATE TABLE temp_submission_galleys AS SELECT * FROM submission_galleys</query>
+		<query>CREATE INDEX temp_submission_galleys_s_id ON temp_submission_galleys (submission_id)</query>
+
 		<!-- move submission_galleys to publication_galleys -->
 		<query>
 			INSERT INTO publication_galleys(galley_id, locale, publication_id, label, file_id, seq, remote_url, is_approved)
