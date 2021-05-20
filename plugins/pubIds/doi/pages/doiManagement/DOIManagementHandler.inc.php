@@ -13,8 +13,13 @@
  * @brief Handle requests for DOI management functions.
  */
 
-import('classes.handler.Handler');
 import('plugins.pubIds.doi.classes.DoiListPanel');
+
+use APP\handler\Handler;
+use PKP\security\authorization\PolicySet;
+use PKP\security\authorization\RoleBasedHandlerOperationPolicy;
+
+use PKP\security\Role;
 
 class DOIManagementHandler extends Handler
 {
@@ -32,7 +37,7 @@ class DOIManagementHandler extends Handler
         parent::__construct();
 
         $this->addRoleAssignment(
-            [ROLE_ID_MANAGER, ROLE_ID_SITE_ADMIN],
+            [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SITE_ADMIN],
             ['index', 'management']
         );
     }
@@ -42,10 +47,8 @@ class DOIManagementHandler extends Handler
      */
     public function authorize($request, &$args, $roleAssignments)
     {
-        import('lib.pkp.classes.security.authorization.PolicySet');
-        $rolePolicy = new PolicySet(COMBINING_PERMIT_OVERRIDES);
+        $rolePolicy = new PolicySet(PolicySet::COMBINING_PERMIT_OVERRIDES);
 
-        import('lib.pkp.classes.security.authorization.RoleBasedHandlerOperationPolicy');
         foreach ($roleAssignments as $role => $operations) {
             $rolePolicy->addPolicy(new RoleBasedHandlerOperationPolicy($request, $role, $operations));
         }
