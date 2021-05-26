@@ -60,12 +60,8 @@ class DOIPubIdPlugin extends PubIdPlugin
             HookRegistry::register('TemplateManager::setupBackendPage', [$this, 'setupDoiManagementPage']);
             HookRegistry::register('LoadHandler', [$this, 'callbackLoadHandler']);
             $this->_registerTemplateResource(true);
-            // Submissions with Crossref status API
-            HookRegistry::register('API::submissions::params', [$this, 'modifyAPISubmissionsParams']);
-            HookRegistry::register('Submission::getMany::queryBuilder', [$this, 'modifySubmissionQueryBuilder']);
             HookRegistry::register('Submission::getMany::queryObject', [$this, 'modifySubmissionQueryObject']);
             // Issue with publication status, publications
-            HookRegistry::register('API::issues::params', [$this, 'modifyAPIIssuesParams']);
             HookRegistry::register('Issue::getProperties::summaryProperties', [$this, 'modifyObjectProperties']);
             HookRegistry::register('Issue::getProperties::values', [$this, 'modifyObjectPropertyValues']);
             // Edit published DOIs API
@@ -206,124 +202,6 @@ class DOIPubIdPlugin extends PubIdPlugin
     }
 
     /**
-     * Collect and sanitize request params for submissions API endpoint
-     *
-     * @param $hookname string
-     * @param $args array [
-     * 		@option array $returnParams
-     * 		@option SlimRequest $slimRequest
-     * ]
-     *
-     * @return array
-     */
-    public function modifyAPISubmissionsParams($hookname, $args)
-    {
-        $returnParams = & $args[0];
-        $slimRequest = $args[1];
-        $requestParams = $slimRequest->getQueryParams();
-
-        foreach ($requestParams as $param => $value) {
-            switch ($param) {
-                case 'includeCrossrefStatus':
-                    // TODO: Should not be loaded within DOI plugin
-                    // Load crossref plugin to include crossref status in schemas
-                    // Called here to ensure plugin loaded when schema is built
-//					$crossrefPlugin = PluginRegistry::loadPlugin("importexport", "crossref");
-                    break;
-
-                // Always convert crossrefStatus to array
-                case 'crossrefStatus':
-                    if (is_string($value) && strpos($value, ',') > -1) {
-                        $value = explode(',', $value);
-                    } elseif (!is_array($value)) {
-                        $value = [$value];
-                    }
-                    // TODO: If using int, must map with array_map('intval', $value)
-                    $returnParams[$param] = $value;
-                    break;
-            }
-        }
-    }
-
-    /**
-     * Run app-specific query builder methods for getMany
-     *
-     * @param $args array [
-     * 		@option \APP\Services\QueryBuilders\SubmissionQueryBuilder
-     * 		@option int Context ID
-     * 		@option array Request args
-     * ]
-     *
-     * @return \APP\Services\QueryBuilders\SubmissionQueryBuilder
-     */
-    public function modifySubmissionQueryBuilder($hookname, $args)
-    {
-        // This is for modifying the query builder, i.e. to add crossref::status as a filter
-        $submissionQB = & $args[0];
-        $queryArgs = $args[1];
-
-        if (!empty($queryArgs['crossrefStatus'])) {
-            $crossrefStatus = $queryArgs['crossrefStatus'];
-            $submissionQB->crossrefStatus = $crossrefStatus;
-        }
-    }
-
-    /**
-     * Add app-specific query statements to the submission getMany query
-     *
-     * @param $args array [
-     * 		@option object $queryObject
-     * 		@option \APP\Services\QueryBuilders\SubmissionQueryBuilder $queryBuilder
-     * ]
-     *
-     * @return object
-     */
-    public function modifySubmissionQueryObject($hookname, $args)
-    {
-        // Include desired query into the query objects, i.e. filter on crossref::status
-        $queryObject = & $args[0];
-        $queryBuilder = $args[1];
-
-        if (!empty($queryBuilder->crossrefStatus)) {
-            $crossrefStatus = $queryBuilder->crossrefStatus;
-
-            $queryObject->leftJoin('submission_settings as pss', function ($queryObject) {
-                $queryObject->on('pss.submission_id', '=', 's.submission_id');
-                $queryObject->on('pss.setting_name', '=', DB::raw("'crossref::status'"));
-            });
-
-            // Items not deposited are null in DB, so first check for notDepsited filter and remove from array
-            $useNotDeposited = false;
-            if (in_array('notDeposited', $crossrefStatus)) {
-                $toRemove = ['notDeposited'];
-                $crossrefStatus = array_values(array_diff($crossrefStatus, $toRemove));
-                $useNotDeposited = true;
-            }
-
-            // If the remaining crossrefStatus array is not empty,
-            // add it along with notDeposited null query if present
-            $queryObject->where(function ($queryObject) use ($crossrefStatus, $useNotDeposited) {
-                if (!empty($crossrefStatus)) {
-                    if ($useNotDeposited) {
-                        $queryObject->whereNull('pss.setting_value');
-                        $queryObject->orWhere(function ($queryObject) use ($crossrefStatus) {
-                            $queryObject->whereIn('pss.setting_value', $crossrefStatus);
-                        });
-                    } else {
-                        $queryObject->whereIn('pss.setting_value', $crossrefStatus);
-                    }
-                } else {
-                    // Otherwise if notDeposited was the only filter in crossrefStatus,
-                    // add the null query
-                    if ($useNotDeposited) {
-                        $queryObject->whereNull('pss.setting_value');
-                    }
-                }
-            });
-        }
-    }
-
-    /**
      * Add custom endpoints to APIHandler
      *
      * @param $hookName string APIHandler::endpoints
@@ -365,35 +243,6 @@ class DOIPubIdPlugin extends PubIdPlugin
                     ]
                 );
                 break;
-        }
-    }
-
-    /**
-     * Collect and sanitize request params for Issues API endpoint
-     *
-     * @param $hookName string
-     * @param $args array [
-     * 		@option array $returnParams
-     * 		@option SlimRequest $slimRequest
-     * ]
-     *
-     * @return array
-     */
-    public function modifyAPIIssuesParams($hookName, $args)
-    {
-        $returnParams = & $args[0];
-        $slimRequest = $args[1];
-        $requestParams = $slimRequest->getQueryParams();
-
-        foreach ($requestParams as $param => $value) {
-            switch ($param) {
-                case 'includeCrossrefStatus':
-                    // Load crossref plugin to include crossref status in schemas
-                    // Called here to ensure plugin loaded when schema is built
-                    // TODO: Again, check how this should be handled. If making crossref generic plugin—unnecessary
-//					$crossrefPlugin = PluginRegistry::loadPlugin("importexport", "crossref");
-                    break;
-            }
         }
     }
 
@@ -968,14 +817,10 @@ class DOIPubIdPlugin extends PubIdPlugin
 
         $props[] = 'pub-id::doi';
 
-        $doiManagementArgs = $propertyArgs['doiManagementArgs'];
-
         // Used in Issue DOI management
-        if (get_class($object) == 'Issue' && (
-            (isset($_REQUEST['includeCrossrefStatus']) && $_REQUEST['includeCrossrefStatus'] == true)
-        )
-            || isset($doiManagementArgs)
-        ) {
+		// TODO: See if only used with Crossref or DOI management at large
+        if ($object instanceof Issue && isset($_REQUEST['crossrefPluginEnabled']) && $_REQUEST['crossrefPluginEnabled'] == true)
+		{
             $props[] = 'isPublished';
             $props[] = 'articles';
         }

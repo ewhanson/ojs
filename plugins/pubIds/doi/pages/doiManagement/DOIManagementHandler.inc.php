@@ -100,20 +100,14 @@ class DOIManagementHandler extends Handler
 
         $templateMgr = TemplateManager::getManager($request);
 
-        // TODO: Should not be used here. For testing crossref status fetching
-        //		PluginRegistry::loadPlugin("importexport", "crossref");
-
-        $getParams = [
-            'includeCrossrefStatus' => $this->_getCrossrefPluginStatus() ? 'true' : 'false',
-        ];
-
         $commonArgs = [
             'doiPrefix' => $plugin->getSetting($request->getContext()->getId(), $plugin->getPrefixFieldName()) . '/',
-            'getParams' => $getParams,
+            'getParams' => [],
             'lazyLoad' => true,
-            'crossrefPluginEnabled' => $this->_getCrossrefPluginStatus(),
             'enabledPublishingObjects' => $enabledPublishingObjects,
         ];
+
+        HookRegistry::call('DoiManagement::setListPanelArgs', [&$commonArgs]);
 
         $stateComponents = [];
 

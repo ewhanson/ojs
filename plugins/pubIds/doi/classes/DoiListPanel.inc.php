@@ -80,31 +80,6 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel
                     ]
                 ]
             ];
-            $config['filters'][] = [
-                'heading' => 'Crossref Deposit Status',
-                'filters' => [
-                    [
-                        'title' => 'Not deposited',
-                        'param' => 'crossrefStatus',
-                        'value' => 'notDeposited'
-                    ],
-                    [
-                        'title' => 'Active',
-                        'param' => 'crossrefStatus',
-                        'value' => 'registered'
-                    ],
-                    [
-                        'title' => 'Failed',
-                        'param' => 'crossrefStatus',
-                        'value' => 'failed'
-                    ],
-                    [
-                        'title' => 'Marked Active',
-                        'param' => 'crossrefStatus',
-                        'value' => 'markedRegistered'
-                    ],
-                ]
-            ];
         } else {
             $config['filters'][] = [
                 'heading' => 'Publication Status',
@@ -115,7 +90,7 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel
                         'value' => '1'
                     ],
                     [
-                        'title' => 'Published',
+                        'title' => 'Unpublished',
                         'param' => 'isPublished',
                         'value' => '0'
                     ],
@@ -143,7 +118,6 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel
             ];
         }
 
-        // TODO: Make inclusion of crossref plugin dependent on Crossref plugin, not DOI plugin
         $config = array_merge(
             $config,
             [
@@ -152,17 +126,18 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel
                 'doiPrefix' => $this->doiPrefix,
                 'itemMax' => $this->itemsMax,
                 'isSubmission' => $this->isSubmission,
-                'crossrefPluginEnabled' => $this->crossrefPluginEnabled,
             ]
         );
+
+        HookRegistry::call('DoiListPanel::setConfig', [&$config]);
 
         // Provide required locale keys
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->setConstants([
-            'STATUS_QUEUED',
-            'STATUS_PUBLISHED',
-            'STATUS_DECLINED',
-            'STATUS_SCHEDULED',
+            PKPSubmission::STATUS_QUEUED,
+            PKPSubmission::STATUS_PUBLISHED,
+            PKPSubmission::STATUS_DECLINED,
+            PKPSubmission::STATUS_SCHEDULED,
         ]);
         $templateMgr->setLocaleKeys([
             'plugins.importexport.crossref.status.notDeposited',
@@ -172,65 +147,4 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel
 
         return $config;
     }
-//
-//	/**
-//	 * Helper method to get the items property according to the self::$getParams
-//	 *
-//	 * @param Request $request
-//	 * @return array
-//	 */
-//	public function getItems($request) {
-//		$itemType = $this->isSubmission ? 'submission' : 'issues';
-//		$items = [];
-//		$itemIterator = Services::get($itemType)->getMany($this->_getItemsParams());
-//
-//		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
-//		$propertyArgs = [
-//			'request' => $request,
-//			'userGroups' => $userGroupDao->getByContextId($request->getContext()->getId())->toArray(),
-//			'doiManagementArgs' => [
-//				// TODO: See if getting crossref status here is helpful or a simple generic, "doi managment" status instead
-//				'includeCrossrefStatus' => $this->crossrefPluginEnabled
-//			]
-//		];
-//
-//		foreach ($itemIterator as $item) {
-//			$items[] = Services::get($itemType)->getSummaryProperties($item, $propertyArgs);
-//		}
-//
-//		return $items;
-//
-//	}
-//
-//	/**
-//	 * Helper method to get the itemsMax property according to self::$getParams
-//	 *
-//	 * @return int
-//	 */
-//	public function getItemsMax() {
-//		$itemType = $this->isSubmission ? 'submission' : 'issues';
-//		return Services::get($itemType)->getMax($this->_getItemsParams());
-//	}
-//
-//	/**
-//	 * Helper method to compile initial params to get items
-//	 *
-//	 * @return array
-//	 */
-//	protected function _getItemsParams() {
-//		$request = \Application::get()->getRequest();
-//		$context = $request->getContext();
-//		$contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
-//
-//		return array_merge(
-//			array(
-//				'contextId' => $contextId,
-//				'count' => $this->count,
-//				'offset' => 0,
-//				// TODO: See what counts as incomplete before passing
-////				'isIncomplete' => false,
-//			),
-//			$this->getParams
-//		);
-//	}
 }
