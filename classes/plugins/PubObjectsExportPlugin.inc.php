@@ -236,7 +236,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
     {
         $context = $request->getContext();
         $path = ['plugin', $this->getName()];
-        if ($request->getUserVar(EXPORT_ACTION_EXPORT)) {
+        if ($this->_checkForExportAction(EXPORT_ACTION_EXPORT)) {
             assert($filter != null);
 
             $onlyValidateExport = ($request->getUserVar('onlyValidateExport')) ? true : false;
@@ -272,7 +272,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
                 $fileManager->downloadByPath($exportFileName);
                 $fileManager->deleteByPath($exportFileName);
             }
-        } elseif ($request->getUserVar(EXPORT_ACTION_DEPOSIT)) {
+        } elseif ($this->_checkForExportAction(EXPORT_ACTION_DEPOSIT)) {
             assert($filter != null);
             // Get the XML
             $exportXml = $this->exportXML($objects, $filter, $context, $noValidation);
@@ -309,7 +309,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
                 // redirect back to the right tab
                 $request->redirect(null, null, null, $path, null, $tab);
             }
-        } elseif ($request->getUserVar(EXPORT_ACTION_MARKREGISTERED)) {
+        } elseif ($this->_checkForExportAction(EXPORT_ACTION_MARKREGISTERED)) {
             $this->markRegistered($context, $objects);
             if ($shouldRedirect) {
                 // redirect back to the right tab
@@ -889,6 +889,24 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
             DAORegistry::getDAO('SubmissionFileDAO'),
             DAORegistry::getDAO('IssueDAO'),
         ];
+    }
+
+    /**
+     * Checks for export action type as set user var and as action passed from API call
+     *
+     * @param $exportAction string Action to check for
+     * @return bool
+     */
+    protected function _checkForExportAction($exportAction)
+    {
+        $request = $this->getRequest();
+        if ($request->getUserVar($exportAction)) {
+            return true;
+        } else if ($request->getUserVar('action') == $exportAction) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

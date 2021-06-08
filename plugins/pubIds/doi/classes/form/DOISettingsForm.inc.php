@@ -13,6 +13,7 @@
  * @brief Form for journal managers to setup DOI plugin
  */
 
+use APP\template\TemplateManager;
 use PKP\form\Form;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\RemoteActionConfirmationModal;
@@ -24,6 +25,9 @@ class DOISettingsForm extends Form
     //
     /** @var integer */
     public $_contextId;
+
+    /** @var array */
+    private $_enabledRegistrationAgencies = [];
 
     /**
      * Get the context ID.
@@ -125,6 +129,24 @@ class DOISettingsForm extends Form
     // Implement template methods from Form
     //
     /**
+     * @copydoc Form::fetch()
+     */
+    public function fetch($request, $template = null, $display = null)
+    {
+        $templateMgr = TemplateManager::getManager($request);
+
+        HookRegistry::call('DoiSettingsForm::setEnabledRegistrationAgencies', [&$this]);
+        $defaultRegistrationAgency = [
+            'none' => 'None'
+        ];
+        $registrationAgencies = array_merge($defaultRegistrationAgency, $this->_enabledRegistrationAgencies);
+
+        $templateMgr->assign('registrationAgencies', $registrationAgencies);
+
+        return parent::fetch($request, $template, $display);
+    }
+
+    /**
      * @copydoc Form::initData()
      */
     public function initData()
@@ -172,6 +194,17 @@ class DOISettingsForm extends Form
             'doiIssueSuffixPattern' => 'string',
             'doiPublicationSuffixPattern' => 'string',
             'doiRepresentationSuffixPattern' => 'string',
+            'registrationAgency' => 'string',
         ];
+    }
+
+    /**
+     * Adds DOI registration agency to list of selectable options for DOI depositing actions
+     *
+     * @param $pluginName string Name of plugin (lowercase)
+     * @param $displayName string Registration agency display name
+     */
+    public function AddEnabledRegistrationAgency($pluginName, $displayName) {
+        $this->_enabledRegistrationAgencies[$pluginName] = $displayName;
     }
 }

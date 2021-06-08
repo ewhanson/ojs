@@ -57,6 +57,12 @@
 			{fbvElement type="text" id="doiRepresentationSuffixPattern" value=$doiRepresentationSuffixPattern label="plugins.pubIds.doi.manager.settings.doiSuffixPattern.representations" maxlength="40" inline=true size=$fbvStyles.size.MEDIUM}
 		{/fbvFormSection}
 	{/fbvFormArea}
+    {fbvFormArea id="registrationAgencyArea" title="plugins.pubIds.doi.manager.settings.registrationAgency"}
+        <p class="pkp_help">{translate key="plugins.pubIds.doi.manager.settings.registrationAgency.description"}</p>
+        {fbvFormSection for="registrationAgency"}
+            {fbvElement type="select" label="plugins.pubIds.doi.manager.settings.registrationAgency" name="registrationAgency" id="registrationAgency" from=$registrationAgencies selected=$registrationAgency translate="0" size=$fbvStyles.size.MEDIUM}
+        {/fbvFormSection}
+    {/fbvFormArea}
 {*	TODO: Hide nuclear option for now *}
 {*	{fbvFormArea id="doiReassignFormArea" title="plugins.pubIds.doi.manager.settings.doiReassign"}*}
 {*		{fbvFormSection}*}

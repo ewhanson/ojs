@@ -16,6 +16,7 @@
 use PKP\services\interfaces\EntityWriteInterface;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\RemoteActionConfirmationModal;
+use PKP\plugins\PluginRegistry;
 
 use APP\plugins\PubIdPlugin;
 use APP\publication\Publication;
@@ -484,6 +485,11 @@ class DOIPubIdPlugin extends PubIdPlugin
         );
 
         return $response->withJson($issueProps, 200);
+    }
+
+    public function initiateExportAction($action, $requestBody) {
+        $doiRegistrantPlugin = $this->_getConfiguredRegistrationAgencyPlugin();
+        $doiRegistrantPlugin->initiateExportAction($action, $requestBody);
     }
 
     //
@@ -1012,6 +1018,24 @@ class DOIPubIdPlugin extends PubIdPlugin
                 'description' => $table,
                 'groupId' => 'default',
             ]));
+        }
+    }
+
+    private function _getConfiguredRegistrationAgencyPlugin() {
+        $request = Application::get()->getRequest();
+        $context = $request->getContext();
+
+        $configuredPluginName = $this->getSetting($context->getId(), 'registrationAgency');
+        if (empty($configuredPluginName) || $configuredPluginName == 'none') {
+            // TODO: Handle no configured plugin available.
+            return;
+        }
+
+        $plugins = PluginRegistry::getAllPlugins();
+        foreach ($plugins as $name => $plugin) {
+            if ($configuredPluginName == $name) {
+                return $plugin;
+            }
         }
     }
 }
