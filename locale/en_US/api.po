@@ -47,6 +47,12 @@ msgstr "You do not have permission to delete this journal."
 msgid "api.contexts.404.contextNotFound"
 msgstr "The journal you requested was not found."
 
+msgid "api.dois.406.noActionIncluded"
+msgstr "No valid action was included with the request."
+
+msgid "api.dois.406.noSubmissionsIncluded"
+msgstr "No valid action was included with the request."
+
 msgid "api.emailTemplates.403.notAllowedChangeContext"
 msgstr "You do not have permission to move this email template to another journal."
 

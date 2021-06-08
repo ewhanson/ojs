@@ -110,6 +110,15 @@ msgstr "Assign DOIs to all published journal objects that have not been assigned
 msgid "plugins.pubIds.doi.manager.settings.doiAssignJournalWide.confirm"
 msgstr "Are you sure you wish to assign DOIs to all published objects that have not been assigned DOIs?"
 
+msgid "plugins.pubIds.doi.manager.settings.registrationAgency"
+msgstr "Registration Agency"
+
+msgid "plugins.pubIds.doi.manager.settings.registrationAgency.description"
+msgstr "Please select the registration agency you would like to use when depositing DOIs."
+
+msgid "plugins.pubIds.doi.manager.settings.registrationAgency.none"
+msgstr "None"
+
 msgid "plugins.pubIds.doi.editor.doi"
 msgstr "DOI"
 
