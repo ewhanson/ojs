@@ -28,7 +28,7 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel
     public $getParams = [];
 
     /** @var int Max number of items available to display in this list panel */
-    public $itemsMax = [];
+    public $itemsMax = 0;
 
     /** @var bool Whether objects being passed to DOI List Panel are submissions or not */
     public $isSubmission = true;
@@ -48,6 +48,10 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel
     /** @var array Which publishing objecst have DOIs enabled */
     public $enabledPublishingObjects = [];
 
+    /** @var string DOI API url for handling DOI operations */
+    public $doiApiUrl = '';
+
+
     /**
      * @copydoc ListPanel::getConfig()
      */
@@ -58,10 +62,11 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel
 
         $config = parent::getConfig();
         $config['apiUrl'] = $this->apiUrl;
+        $config['doiApiUrl'] = $this->doiApiUrl;
         $config['count'] = $this->count;
         $config['getParams'] = $this->getParams;
         $config['lazyLoad'] = $this->lazyLoad;
-        $config['itemMax'] = $this->itemsMax;
+        $config['itemsMax'] = $this->itemsMax;
         $config['hasDOIs'] = $this->enabledPublishingObjects;
 
         if ($this->isSubmission) {
@@ -121,10 +126,11 @@ class DoiListPanel extends PKP\components\listPanels\ListPanel
         $config = array_merge(
             $config,
             [
-                'apiUrl' => $this->apiUrl,
-                'count' => $this->count,
+                // TODO: To remove. Make sure not changed elsewhere
+                //                'apiUrl' => $this->apiUrl,
+                //                'count' => $this->count,
                 'doiPrefix' => $this->doiPrefix,
-                'itemMax' => $this->itemsMax,
+                //                'itemsMax' => $this->itemsMax,
                 'isSubmission' => $this->isSubmission,
             ]
         );

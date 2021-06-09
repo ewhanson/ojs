@@ -40,6 +40,7 @@ use PKP\db\DAORegistry;
 use PKP\db\SchemaDAO;
 use PKP\file\FileManager;
 use PKP\linkAction\LinkAction;
+
 use PKP\linkAction\request\NullAction;
 use PKP\notification\PKPNotification;
 use PKP\plugins\HookRegistry;
@@ -299,7 +300,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
                         $this->_sendNotification(
                             $request->getUser(),
                             $error[0],
-							PKPNotification::NOTIFICATION_TYPE_ERROR,
+                            PKPNotification::NOTIFICATION_TYPE_ERROR,
                             ($error[1] ?? null)
                         );
                     }
@@ -897,6 +898,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
      * Checks for export action type as set user var and as action passed from API call
      *
      * @param $exportAction string Action to check for
+     *
      * @return bool
      */
     protected function _checkForExportAction($exportAction)
@@ -904,7 +906,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
         $request = $this->getRequest();
         if ($request->getUserVar($exportAction)) {
             return true;
-        } else if ($request->getUserVar('action') == $exportAction) {
+        } elseif ($request->getUserVar('action') == $exportAction) {
             return true;
         }
 
