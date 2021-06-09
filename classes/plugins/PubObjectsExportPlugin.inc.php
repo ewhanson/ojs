@@ -29,22 +29,20 @@ define('EXPORT_ACTION_DEPOSIT', 'deposit');
 // Configuration errors.
 define('EXPORT_CONFIG_ERROR_SETTINGS', 0x02);
 
+use APP\core\Application;
+use APP\i18n\AppLocale;
+use APP\notification\NotificationManager;
+use APP\template\TemplateManager;
 use PKP\core\JSONMessage;
+use PKP\db\DAORegistry;
 use PKP\db\SchemaDAO;
-use PKP\plugins\HookRegistry;
-use PKP\submission\PKPSubmission;
 use PKP\file\FileManager;
 use PKP\linkAction\LinkAction;
-use PKP\linkAction\request\NullAction;
-use PKP\plugins\ImportExportPlugin;
-use PKP\db\DAORegistry;
-use PKP\notification\PKPNotification;
 
-use APP\plugins\PubObjectCache;
-use APP\template\TemplateManager;
-use APP\i18n\AppLocale;
-use APP\core\Application;
-use APP\notification\NotificationManager;
+use PKP\linkAction\request\NullAction;
+use PKP\notification\PKPNotification;
+use PKP\plugins\HookRegistry;
+use PKP\plugins\ImportExportPlugin;
 
 abstract class PubObjectsExportPlugin extends ImportExportPlugin
 {
@@ -117,6 +115,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
                 } else {
                     return new JSONMessage(true, $form->fetch($request));
                 }
+                // no break
             case 'index':
                 $form->initData();
                 return new JSONMessage(true, $form->fetch($request));
@@ -252,13 +251,13 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
                     $this->_sendNotification(
                         $request->getUser(),
                         'plugins.importexport.common.validation.success',
-						PKPNotification::NOTIFICATION_TYPE_SUCCESS
+                        PKPNotification::NOTIFICATION_TYPE_SUCCESS
                     );
                 } else {
                     $this->_sendNotification(
                         $request->getUser(),
                         'plugins.importexport.common.validation.fail',
-						PKPNotification::NOTIFICATION_TYPE_ERROR
+                        PKPNotification::NOTIFICATION_TYPE_ERROR
                     );
                 }
 
@@ -288,7 +287,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
                 $this->_sendNotification(
                     $request->getUser(),
                     $this->getDepositSuccessNotificationMessageKey(),
-					PKPNotification::NOTIFICATION_TYPE_SUCCESS
+                    PKPNotification::NOTIFICATION_TYPE_SUCCESS
                 );
             } else {
                 if (is_array($result)) {
@@ -297,7 +296,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
                         $this->_sendNotification(
                             $request->getUser(),
                             $error[0],
-							PKPNotification::NOTIFICATION_TYPE_ERROR,
+                            PKPNotification::NOTIFICATION_TYPE_ERROR,
                             ($error[1] ?? null)
                         );
                     }
@@ -895,6 +894,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
      * Checks for export action type as set user var and as action passed from API call
      *
      * @param $exportAction string Action to check for
+     *
      * @return bool
      */
     protected function _checkForExportAction($exportAction)
@@ -902,7 +902,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
         $request = $this->getRequest();
         if ($request->getUserVar($exportAction)) {
             return true;
-        } else if ($request->getUserVar('action') == $exportAction) {
+        } elseif ($request->getUserVar('action') == $exportAction) {
             return true;
         }
 

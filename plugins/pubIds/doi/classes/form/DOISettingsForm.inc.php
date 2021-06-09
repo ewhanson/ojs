@@ -130,6 +130,9 @@ class DOISettingsForm extends Form
     //
     /**
      * @copydoc Form::fetch()
+     *
+     * @param null|mixed $template
+     * @param null|mixed $display
      */
     public function fetch($request, $template = null, $display = null)
     {
@@ -204,7 +207,8 @@ class DOISettingsForm extends Form
      * @param $pluginName string Name of plugin (lowercase)
      * @param $displayName string Registration agency display name
      */
-    public function AddEnabledRegistrationAgency($pluginName, $displayName) {
+    public function AddEnabledRegistrationAgency($pluginName, $displayName)
+    {
         $this->_enabledRegistrationAgencies[$pluginName] = $displayName;
     }
 }

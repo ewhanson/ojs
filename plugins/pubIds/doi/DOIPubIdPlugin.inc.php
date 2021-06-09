@@ -13,16 +13,16 @@
  * @brief DOI plugin class
  */
 
-use PKP\services\interfaces\EntityWriteInterface;
+use APP\article\ArticleGalley;
+use APP\issue\Issue;
+use APP\issue\IssueGalley;
+use APP\plugins\PubIdPlugin;
+
+use APP\publication\Publication;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\RemoteActionConfirmationModal;
 use PKP\plugins\PluginRegistry;
-
-use APP\plugins\PubIdPlugin;
-use APP\publication\Publication;
-use APP\issue\Issue;
-use APP\issue\IssueGalley;
-use APP\article\ArticleGalley;
+use PKP\services\interfaces\EntityWriteInterface;
 
 class DOIPubIdPlugin extends PubIdPlugin
 {
@@ -487,7 +487,8 @@ class DOIPubIdPlugin extends PubIdPlugin
         return $response->withJson($issueProps, 200);
     }
 
-    public function initiateExportAction($action, $requestBody) {
+    public function initiateExportAction($action, $requestBody)
+    {
         $doiRegistrantPlugin = $this->_getConfiguredRegistrationAgencyPlugin();
         $doiRegistrantPlugin->initiateExportAction($action, $requestBody);
     }
@@ -821,9 +822,8 @@ class DOIPubIdPlugin extends PubIdPlugin
         $props[] = 'pub-id::doi';
 
         // Used in Issue DOI management
-		// TODO: See if only used with Crossref or DOI management at large
-        if ($object instanceof Issue && isset($_REQUEST['crossrefPluginEnabled']) && $_REQUEST['crossrefPluginEnabled'] == true)
-		{
+        // TODO: See if only used with Crossref or DOI management at large
+        if ($object instanceof Issue && isset($_REQUEST['crossrefPluginEnabled']) && $_REQUEST['crossrefPluginEnabled'] == true) {
             $props[] = 'isPublished';
             $props[] = 'articles';
         }
@@ -1021,7 +1021,8 @@ class DOIPubIdPlugin extends PubIdPlugin
         }
     }
 
-    private function _getConfiguredRegistrationAgencyPlugin() {
+    private function _getConfiguredRegistrationAgencyPlugin()
+    {
         $request = Application::get()->getRequest();
         $context = $request->getContext();
 

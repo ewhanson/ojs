@@ -16,9 +16,9 @@
 import('plugins.pubIds.doi.classes.DoiListPanel');
 
 use APP\handler\Handler;
+use PKP\core\PKPApplication;
 use PKP\security\authorization\PolicySet;
 use PKP\security\authorization\RoleBasedHandlerOperationPolicy;
-
 use PKP\security\Role;
 
 class DOIManagementHandler extends Handler
@@ -118,7 +118,8 @@ class DOIManagementHandler extends Handler
                 array_merge(
                     $commonArgs,
                     [
-                        'apiUrl' => $request->getDispatcher()->url($request, ROUTE_API, $context->getPath(), 'submissions'),
+                        'apiUrl' => $request->getDispatcher()->url($request, PKPApplication::ROUTE_API, $context->getPath(), 'submissions'),
+                        'doiApiUrl' => $request->getDispatcher()->url($request, PKPApplication::ROUTE_API, $context->getPath(), 'dois') . '/submissions',
                         'isSubmission' => true,
                         'includeIssuesFilter' => true,
                     ]
@@ -134,7 +135,8 @@ class DOIManagementHandler extends Handler
                 array_merge(
                     $commonArgs,
                     [
-                        'apiUrl' => $request->getDispatcher()->url($request, ROUTE_API, $context->getPath(), 'issues'),
+                        'apiUrl' => $request->getDispatcher()->url($request, PKPApplication::ROUTE_API, $context->getPath(), 'issues'),
+                        'doiApiUrl' => $request->getDispatcher()->url($request, PKPApplication::ROUTE_API, $context->getPath(), 'dois') . '/issues',
                         'isSubmission' => false,
                         'includeIssuesFilter' => false,
                     ]
