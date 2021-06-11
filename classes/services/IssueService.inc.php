@@ -25,10 +25,10 @@ use APP\submission\Submission;
 use PKP\db\DAORegistry;
 use PKP\db\DAOResultFactory;
 use PKP\db\DBResultRange;
+use PKP\security\UserGroupDAO;
 use PKP\services\interfaces\EntityPropertyInterface;
 use PKP\services\interfaces\EntityReadInterface;
 use PKP\services\PKPSchemaService;
-
 
 class IssueService implements EntityPropertyInterface, EntityReadInterface
 {
@@ -284,8 +284,11 @@ class IssueService implements EntityPropertyInterface, EntityReadInterface
                             ->filterByContextIds([$issue->getJournalId()])
                             ->filterByIssueIds([Submission::STATUS_PUBLISHED])
                     );
+                    $userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /** @var UserGroupDAO $userGroupDao */
+                    $userGroups = $userGroupDao->getByContextId($context->getId())->toArray();
+
                     foreach ($submissions as $submission) {
-                        $values[$prop][] = Repo::submission()->getSchemaMap()->summarize($submission, $args['userGroups']);
+                        $values[$prop][] = Repo::submission()->getSchemaMap()->summarize($submission, $userGroups);
                     }
                     break;
                 case 'sections':
