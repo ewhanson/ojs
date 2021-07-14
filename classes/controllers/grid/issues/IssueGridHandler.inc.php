@@ -239,8 +239,7 @@ class IssueGridHandler extends GridHandler
 
         // Check if the passed filename matches the filename for this issue's
         // cover page.
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        $issue = $issueDao->getById((int) $args['issueId']);
+        $issue = Repo::issue()->get((int) $args['issueId']);
         $locale = AppLocale::getLocale();
         if ($args['coverImage'] != $issue->getCoverImage($locale)) {
             return new JSONMessage(false, __('editor.issues.removeCoverImageFileNameMismatch'));
@@ -251,8 +250,7 @@ class IssueGridHandler extends GridHandler
         // Remove cover image and alt text from issue settings
         $issue->setCoverImage('', $locale);
         $issue->setCoverImageAltText('', $locale);
-        $issueDao->updateObject($issue);
-
+        Repo::issue()->edit($issue, []);
         // Remove the file
         $publicFileManager = new PublicFileManager();
         if ($publicFileManager->removeContextFile($issue->getJournalId(), $file)) {
@@ -357,6 +355,7 @@ class IssueGridHandler extends GridHandler
         // remove all published submissions and return original articles to editing queue
         $collector = Repo::submission()
             ->getCollector()
+            ->filterByContextIds([$issue->getData('journalId')])
             ->filterByIssueIds([$issue->getId()]);
         $submissions = Repo::submission()->getMany($collector);
         foreach ($submissions as $submission) {
@@ -370,16 +369,15 @@ class IssueGridHandler extends GridHandler
             Repo::submission()->updateStatus($newSubmission);
         }
 
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        $issueDao->deleteObject($issue);
+        Repo::issue()->delete($issue);
         if ($issue->getCurrent()) {
-            $issues = $issueDao->getPublishedIssues($journal->getId());
-            if ($issue = $issues->next()) {
-                $issue->setCurrent(1);
-                $issueDao->updateObject($issue);
+            $issues = Repo::issue()->getPublishedIssues($journal->getId());
+            if ($issue = $issues->first()) {
+                Repo::issue()->setCurrent($issue);
             }
         }
 
+        // TODO: Should this be updated in any way?
         return DAO::getDataChangedEvent($issue->getId());
     }
 
@@ -560,8 +558,7 @@ class IssueGridHandler extends GridHandler
 
         HookRegistry::call('IssueGridHandler::publishIssue', [&$issue]);
 
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        $issueDao->updateCurrent($contextId, $issue);
+        Repo::issue()->updateCurrent($contextId, $issue);
 
         if (!$wasPublished) {
             // Publish all related publications
@@ -628,14 +625,17 @@ class IssueGridHandler extends GridHandler
             return new JSONMessage(false);
         }
 
-        $issue->setCurrent(0);
-        $issue->setPublished(0);
-        $issue->setDatePublished(null);
+        // NB: Data set via params because setData('datePublished', null)
+        // removes the entry into _data rather than updating 'datePublished' to null.
+        $updateParams = [
+            'current' => 0,
+            'published' => 0,
+            'datePublished' => null
+        ];
 
         HookRegistry::call('IssueGridHandler::unpublishIssue', [&$issue]);
 
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        $issueDao->updateObject($issue);
+        Repo::issue()->edit($issue, $updateParams);
 
         // insert article tombstones for all articles
         $submissions = Repo::submission()->getMany(
@@ -680,8 +680,7 @@ class IssueGridHandler extends GridHandler
 
         $issue->setCurrent(1);
 
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        $issueDao->updateCurrent($journal->getId(), $issue);
+        Repo::issue()->updateCurrent($journal->getId(), $issue);
 
         $dispatcher = $request->getDispatcher();
         return DAO::getDataChangedEvent();

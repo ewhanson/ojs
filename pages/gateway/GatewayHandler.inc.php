@@ -13,6 +13,7 @@
  * @brief Handle external gateway requests.
  */
 
+use APP\facades\Repo;
 use APP\handler\Handler;
 
 use APP\template\TemplateManager;
@@ -76,12 +77,12 @@ class GatewayHandler extends Handler
 
             $year = $request->getUserVar('year');
 
-            $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+            $deprecatedDao = Repo::issue()->dao->deprecatedDao;
 
             // FIXME Should probably go in IssueDAO or a subclass
             if (isset($year)) {
                 $year = (int)$year;
-                $result = $issueDao->retrieve(
+                $result = $deprecatedDao->retrieve(
                     'SELECT * FROM issues WHERE journal_id = ? AND year = ? AND published = 1 ORDER BY current DESC, year ASC, volume ASC, number ASC',
                     [$journal->getId(), $year]
                 );
@@ -91,7 +92,7 @@ class GatewayHandler extends Handler
             }
 
             if (!isset($year)) {
-                $result = $issueDao->retrieve(
+                $result = $deprecatedDao->retrieve(
                     'SELECT MAX(year) AS max_year FROM issues WHERE journal_id = ? AND published = 1',
                     [$journal->getId()]
                 );
@@ -102,14 +103,14 @@ class GatewayHandler extends Handler
 
             $prevYear = $nextYear = null;
             if (isset($year)) {
-                $result = $issueDao->retrieve(
+                $result = $deprecatedDao->retrieve(
                     'SELECT MAX(year) AS max_year FROM issues WHERE journal_id = ? AND published = 1 AND year < ?',
                     [$journal->getId(), $year]
                 );
                 $row = $result->current();
                 $prevYear = $row ? $row->max_year : null;
 
-                $result = $issueDao->retrieve(
+                $result = $deprecatedDao->retrieve(
                     'SELECT MIN(year) AS min_year FROM issues WHERE journal_id = ? AND published = 1 AND year > ?',
                     [$journal->getId(), $year]
                 );
@@ -117,13 +118,13 @@ class GatewayHandler extends Handler
                 $nextYear = $row ? $row->min_year : null;
             }
 
-            $issues = $issueDao->getPublishedIssuesByNumber($journal->getId(), null, null, $year);
+            $issues = Repo::issue()->getPublishedIssuesByNumber($journal->getId(), null, null, $year);
             $templateMgr->assign([
                 'journal' => $journal,
                 'year' => $year,
                 'prevYear' => $prevYear,
                 'nextYear' => $nextYear,
-                'issues' => $issues,
+                'issues' => $issues->toArray(),
             ]);
 
             $locales = $journal->getSupportedLocaleNames();
@@ -163,12 +164,12 @@ class GatewayHandler extends Handler
 
             $year = $request->getUserVar('year');
 
-            $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+            $deprecatedIssueDao = Repo::issue()->dao->deprecatedDao;
 
             // FIXME Should probably go in IssueDAO or a subclass
             if (isset($year)) {
                 $year = (int)$year;
-                $result = $issueDao->retrieve(
+                $result = $deprecatedIssueDao->retrieve(
                     'SELECT * FROM issues WHERE journal_id = ? AND year = ? AND published = 1 ORDER BY current DESC, year ASC, volume ASC, number ASC',
                     [$journal->getId(), $year]
                 );
@@ -179,29 +180,29 @@ class GatewayHandler extends Handler
             }
 
             if (!isset($year)) {
-                $result = $issueDao->retrieve(
+                $result = $deprecatedIssueDao->retrieve(
                     'SELECT MAX(year) AS max_year FROM issues WHERE journal_id = ? AND published = 1',
                     [$journal->getId()]
                 );
                 $row = $result->current();
                 $year = $row ? $row->max_year : null;
-                $issues = $issueDao->getPublishedIssuesByNumber($journal->getId(), null, null, $year);
+                $issues = Repo::issue()->getPublishedIssuesByNumber($journal->getId(), null, null, $year);
                 $templateMgr->assign([
-                    'issues' => $issues,
+                    'issues' => $issues->toArray(),
                     'showInfo' => true,
                 ]);
             }
 
             $prevYear = $nextYear = null;
             if (isset($year)) {
-                $result = $issueDao->retrieve(
+                $result = $deprecatedIssueDao->retrieve(
                     'SELECT MAX(year) AS max_year FROM issues WHERE journal_id = ? AND published = 1 AND year < ?',
                     [$journal->getId(), $year]
                 );
                 $row = $result->current();
                 $prevYear = $row ? $row->max_year : null;
 
-                $result = $issueDao->retrieve(
+                $result = $deprecatedIssueDao->retrieve(
                     'SELECT MIN(year) AS min_year FROM issues WHERE journal_id = ? AND published = 1 AND year > ?',
                     [$journal->getId(), $year]
                 );
@@ -209,13 +210,13 @@ class GatewayHandler extends Handler
                 $nextYear = $row ? $row->min_year : null;
             }
 
-            $issues = $issueDao->getPublishedIssuesByNumber($journal->getId(), null, null, $year);
+            $issues = Repo::issue()->getPublishedIssuesByNumber($journal->getId(), null, null, $year);
             $templateMgr->assign([
                 'journal' => $journal,
                 'year' => $year,
                 'prevYear' => $prevYear,
                 'nextYear' => $nextYear,
-                'issues' => $issues,
+                'issues' => $issues->toArray(),
             ]);
 
             $locales = $journal->getSupportedLocaleNames();

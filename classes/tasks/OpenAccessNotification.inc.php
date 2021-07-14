@@ -97,10 +97,9 @@ class OpenAccessNotification extends ScheduledTask
             $curDay = $curDate['day'];
 
             // Check if the current date corresponds to the open access date of any issues
-            $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-            $issues = $issueDao->getPublishedIssues($journal->getId());
+            $issues = Repo::issue()->getPublishedIssues($journal->getId());
 
-            while ($issue = $issues->next()) {
+            foreach ($issues as $issue) {
                 $accessStatus = $issue->getAccessStatus();
                 $openAccessDate = $issue->getOpenAccessDate();
 

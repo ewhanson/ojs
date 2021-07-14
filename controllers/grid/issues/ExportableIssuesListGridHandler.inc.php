@@ -13,6 +13,8 @@
  * @brief Handle exportable issues grid requests.
  */
 
+use APP\facades\Repo;
+
 import('classes.controllers.grid.issues.IssueGridHandler');
 
 class ExportableIssuesListGridHandler extends IssueGridHandler
@@ -42,8 +44,18 @@ class ExportableIssuesListGridHandler extends IssueGridHandler
     protected function loadData($request, $filter)
     {
         $journal = $request->getJournal();
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        return $issueDao->getIssues($journal->getId(), $this->getGridRangeInfo($request, $this->getId()));
+
+        // Handle grid paging (deprecated style)
+        $rangeInfo = $this->getGridRangeInfo($request, $this->getId());
+        $collector = Repo::issue()->getCollector()
+            ->filterByContext($journal->getId());
+        $totalCount = Repo::issue()->getCount($collector);
+        $collector->limit($rangeInfo->getCount());
+        $collector->offset($rangeInfo->getoffset() + max(0, $rangeInfo->getPage() - 1) * $rangeInfo->getCount());
+
+        $issues = iterator_to_array(Repo::issue()->getMany($collector));
+
+        return new \PKP\core\VirtualArrayIterator($issues, $totalCount, $rangeInfo->getPage(), $rangeInfo->getCount());
     }
 
     /**

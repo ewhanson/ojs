@@ -13,6 +13,7 @@
  * @brief Handle issues grid requests.
  */
 
+use APP\facades\Repo;
 use PKP\controllers\grid\feature\OrderGridItemsFeature;
 use PKP\controllers\grid\GridColumn;
 use PKP\security\Role;
@@ -74,8 +75,7 @@ class BackIssueGridHandler extends IssueGridHandler
      */
     public function setDataElementSequence($request, $rowId, $gridDataElement, $newSequence)
     {
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        $issueDao->moveCustomIssueOrder($gridDataElement->getJournalId(), $gridDataElement->getId(), $newSequence);
+        Repo::issue()->dao->moveCustomIssueOrder($gridDataElement->getJournalId(), $gridDataElement->getId(), $newSequence);
     }
 
     /**
@@ -83,8 +83,7 @@ class BackIssueGridHandler extends IssueGridHandler
      */
     public function getDataElementSequence($gridDataElement)
     {
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        $customOrder = $issueDao->getCustomIssueOrder($gridDataElement->getJournalId(), $gridDataElement->getId());
+        $customOrder = Repo::issue()->dao->getCustomIssueOrder($gridDataElement->getJournalId(), $gridDataElement->getId());
         if ($customOrder !== null) {
             return $customOrder;
         }
@@ -109,8 +108,7 @@ class BackIssueGridHandler extends IssueGridHandler
     protected function loadData($request, $filter)
     {
         $journal = $request->getJournal();
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        return $issueDao->getPublishedIssues($journal->getId());
+        return Repo::issue()->getPublishedIssues($journal->getId());
     }
 
     /**

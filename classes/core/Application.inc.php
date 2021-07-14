@@ -118,6 +118,7 @@ class Application extends PKPApplication
             'AuthorDAO' => 'APP\article\AuthorDAO',
             'IndividualSubscriptionDAO' => 'APP\subscription\IndividualSubscriptionDAO',
             'InstitutionalSubscriptionDAO' => 'APP\subscription\InstitutionalSubscriptionDAO',
+            // TODO: What should be done with this?
             'IssueDAO' => 'APP\issue\IssueDAO',
             'IssueGalleyDAO' => 'APP\issue\IssueGalleyDAO',
             'IssueFileDAO' => 'APP\issue\IssueFileDAO',

@@ -34,13 +34,12 @@ class SitemapHandler extends PKPSitemapHandler
         // Search
         $root->appendChild($this->_createUrlTree($doc, $request->url($journal->getPath(), 'search')));
         // Issues
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
         $galleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $galleyDao ArticleGalleyDAO */
         if ($journal->getData('publishingMode') != \APP\journal\Journal::PUBLISHING_MODE_NONE) {
             $root->appendChild($this->_createUrlTree($doc, $request->url($journal->getPath(), 'issue', 'current')));
             $root->appendChild($this->_createUrlTree($doc, $request->url($journal->getPath(), 'issue', 'archive')));
-            $publishedIssues = $issueDao->getPublishedIssues($journalId);
-            while ($issue = $publishedIssues->next()) {
+            $publishedIssues = Repo::issue()->getPublishedIssues($journalId);
+            foreach ($publishedIssues as $issue) {
                 $root->appendChild($this->_createUrlTree($doc, $request->url($journal->getPath(), 'issue', 'view', $issue->getId())));
                 // Articles for issue
                 $submissions = Repo::submission()->getMany(

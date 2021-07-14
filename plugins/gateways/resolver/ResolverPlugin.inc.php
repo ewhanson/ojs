@@ -102,14 +102,13 @@ class ResolverPlugin extends GatewayPlugin
                 $number = array_shift($args);
                 $page = (int) array_shift($args);
 
-                $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-                $issues = $issueDao->getPublishedIssuesByNumber($journal->getId(), $volume, $number, $year);
+                $issues = Repo::issue()->getPublishedIssuesByNumber($journal->getId(), $volume, $number, $year);
 
                 // Ensure only one issue matched, and fetch it.
-                $issue = $issues->next();
-                if (!$issue || $issues->next()) {
+                if ($issues->count() != 1) {
                     break;
                 }
+                $issue = $issues->first();
                 unset($issues);
 
                 $submissions = Repo::submission()->getMany(
@@ -156,18 +155,17 @@ class ResolverPlugin extends GatewayPlugin
     public function exportHoldings()
     {
         $journalDao = DAORegistry::getDAO('JournalDAO'); /* @var $journalDao JournalDAO */
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
         $journals = $journalDao->getAll(true);
         $request = Application::get()->getRequest();
         header('content-type: text/plain');
         header('content-disposition: attachment; filename=holdings.txt');
         echo "title\tissn\te_issn\tstart_date\tend_date\tembargo_months\tembargo_days\tjournal_url\tvol_start\tvol_end\tiss_start\tiss_end\n";
         while ($journal = $journals->next()) {
-            $issues = $issueDao->getPublishedIssues($journal->getId());
+            $issues = Repo::issue()->getPublishedIssues($journal->getId());
             $startDate = $endDate = null;
             $startNumber = $endNumber = null;
             $startVolume = $endVolume = null;
-            while ($issue = $issues->next()) {
+            foreach ($issues as $issue) {
                 $datePublished = $issue->getDatePublished();
                 if ($datePublished !== null) {
                     $datePublished = strtotime($datePublished);

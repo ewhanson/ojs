@@ -13,6 +13,8 @@
  * @brief Class that converts a Native XML document to a set of articles.
  */
 
+use APP\facades\Repo;
+
 import('lib.pkp.plugins.importexport.native.filter.NativeXmlPKPPublicationFilter');
 
 class NativeXmlPublicationFilter extends NativeXmlPKPPublicationFilter
@@ -223,9 +225,8 @@ class NativeXmlPublicationFilter extends NativeXmlPKPPublicationFilter
                 }
             }
         }
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /** @var IssueDAO $issueDao */
         $issue = null;
-        $issuesByIdentification = $issueDao->getIssuesByIdentification($context->getId(), $vol, $num, $year, $titles)->toArray();
+        $issuesByIdentification = Repo::issue()->getIssuesByIdentification($context->getId(), $vol, $num, $year, $titles)->toArray();
 
         if (count($issuesByIdentification) != 1) {
             $deployment->addError(ASSOC_TYPE_PUBLICATION, $publication->getId(), __('plugins.importexport.native.import.error.issueIdentificationMatch', ['issueIdentification' => $node->ownerDocument->saveXML($node)]));
@@ -234,7 +235,7 @@ class NativeXmlPublicationFilter extends NativeXmlPKPPublicationFilter
         }
 
         if (!isset($issue)) {
-            $issue = $issueDao->newDataObject();
+            $issue = Repo::issue()->newDataObject();
 
             $issue->setVolume($vol);
             $issue->setNumber($num);
@@ -249,7 +250,7 @@ class NativeXmlPublicationFilter extends NativeXmlPKPPublicationFilter
             $issue->setJournalId($context->getId());
             $issue->setTitle($titles, null);
 
-            $issueId = $issueDao->insertObject($issue);
+            $issueId = Repo::issue()->add($issue);
 
             $issue->setId($issueId);
         }

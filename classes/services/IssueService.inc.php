@@ -19,143 +19,15 @@ use APP\core\Services;
 use APP\facades\Repo;
 use APP\issue\Issue;
 use APP\journal\Journal;
-use APP\services\queryBuilders\IssueQueryBuilder;
 use APP\submission\Submission;
 
 use PKP\db\DAORegistry;
-use PKP\db\DAOResultFactory;
-use PKP\db\DBResultRange;
 use PKP\services\interfaces\EntityPropertyInterface;
 use PKP\services\interfaces\EntityReadInterface;
 use PKP\services\PKPSchemaService;
 
 class IssueService implements EntityPropertyInterface, EntityReadInterface
 {
-    /**
-     * @copydoc \PKP\services\interfaces\EntityReadInterface::get()
-     */
-    public function get($issueId)
-    {
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        return $issueDao->getById($issueId);
-    }
-
-    /**
-     * @copydoc \PKP\services\interfaces\EntityReadInterface::getCount()
-     */
-    public function getCount($args = [])
-    {
-        return $this->getQueryBuilder($args)->getCount();
-    }
-
-    /**
-     * @copydoc \PKP\services\interfaces\EntityReadInterface::getIds()
-     */
-    public function getIds($args = [])
-    {
-        return $this->getQueryBuilder($args)->getIds();
-    }
-
-    /**
-     * Get a collection of Issue objects limited, filtered
-     * and sorted by $args
-     *
-     * @param array $args {
-     *		@option int contextId If not supplied, CONTEXT_ID_NONE will be used and
-     *			no submissions will be returned. To retrieve issues from all
-     *			contexts, use CONTEXT_ID_ALL.
-     * 		@option int volumes
-     * 		@option int numbers
-     * 		@option int years
-     * 		@option boolean isPublished
-     * 		@option int count
-     * 		@option int offset
-     * 		@option string orderBy
-     * 		@option string orderDirection
-     * }
-     *
-     * @return \Iterator
-     */
-    public function getMany($args = [])
-    {
-        $range = null;
-        if (isset($args['count'])) {
-            $range = new DBResultRange($args['count'], null, $args['offset'] ?? 0);
-        }
-        // Pagination is handled by the DAO, so don't pass count and offset
-        // arguments to the QueryBuilder.
-        if (isset($args['count'])) {
-            unset($args['count']);
-        }
-        if (isset($args['offset'])) {
-            unset($args['offset']);
-        }
-        $issueListQO = $this->getQueryBuilder($args)->getQuery();
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        $result = $issueDao->retrieveRange($issueListQO->toSql(), $issueListQO->getBindings(), $range);
-        $queryResults = new DAOResultFactory($result, $issueDao, '_fromRow');
-
-        return $queryResults->toIterator();
-    }
-
-    /**
-     * @copydoc \PKP\services\interfaces\EntityReadInterface::getMax()
-     */
-    public function getMax($args = [])
-    {
-        // Don't accept args to limit the results
-        if (isset($args['count'])) {
-            unset($args['count']);
-        }
-        if (isset($args['offset'])) {
-            unset($args['offset']);
-        }
-        return $this->getQueryBuilder($args)->getCount();
-    }
-
-    /**
-     * @copydoc \PKP\services\interfaces\EntityReadInterface::getQueryBuilder()
-     *
-     * @return \APP\services\queryBuilders\IssueQueryBuilder
-     */
-    public function getQueryBuilder($args = [])
-    {
-        $defaultArgs = [
-            'contextId' => \PKP\core\PKPApplication::CONTEXT_ID_NONE,
-            'orderBy' => 'datePublished',
-            'orderDirection' => 'DESC',
-            'isPublished' => null,
-            'volumes' => null,
-            'numbers' => null,
-            'years' => null,
-            'searchPhrase' => '',
-        ];
-
-        $args = array_merge($defaultArgs, $args);
-
-        $issueListQB = new IssueQueryBuilder();
-        $issueListQB
-            ->filterByContext($args['contextId'])
-            ->orderBy($args['orderBy'], $args['orderDirection'])
-            ->filterByPublished($args['isPublished'])
-            ->filterByVolumes($args['volumes'])
-            ->filterByNumbers($args['numbers'])
-            ->filterByYears($args['years'])
-            ->searchPhrase($args['searchPhrase']);
-
-        if (isset($args['count'])) {
-            $issueListQB->limitTo($args['count']);
-        }
-
-        if (isset($args['offset'])) {
-            $issueListQB->offsetBy($args['count']);
-        }
-
-        \HookRegistry::call('Issue::getMany::queryBuilder', [&$issueListQB, $args]);
-
-        return $issueListQB;
-    }
-
     /**
      * Determine if a user can access galleys for a specific issue
      *

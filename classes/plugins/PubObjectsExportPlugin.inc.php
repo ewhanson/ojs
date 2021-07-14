@@ -32,6 +32,7 @@ define('EXPORT_CONFIG_ERROR_SETTINGS', 0x02);
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\i18n\AppLocale;
+use APP\issue\Issue;
 use APP\notification\NotificationManager;
 use APP\template\TemplateManager;
 use PKP\config\Config;
@@ -765,9 +766,8 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
     public function getPublishedIssues($issueIds, $context)
     {
         $publishedIssues = [];
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
         foreach ($issueIds as $issueId) {
-            $publishedIssue = $issueDao->getById($issueId, $context->getId());
+            $publishedIssue = Repo::issue()->get($issueId, $context->getId());
             if ($publishedIssue) {
                 $publishedIssues[] = $publishedIssue;
             }
@@ -863,7 +863,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin
             Repo::submission()->dao,
             Application::getRepresentationDAO(),
             DAORegistry::getDAO('SubmissionFileDAO'),
-            DAORegistry::getDAO('IssueDAO'),
+            Repo::issue()->dao
         ];
     }
 }

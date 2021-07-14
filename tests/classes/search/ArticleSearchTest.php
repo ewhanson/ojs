@@ -250,6 +250,7 @@ class ArticleSearchTest extends PKPTestCase
     private function registerMockIssueDAO($published = true)
     {
         // Mock an IssueDAO.
+        // TODO: Will this work with Repo/EntityDAO?
         $issueDAO = $this->getMockBuilder(IssueDAO::class)
             ->setMethods(['getById'])
             ->getMock();

@@ -182,8 +182,7 @@ class ArticleHandler extends Handler
         }
 
         if ($this->publication->getData('issueId')) {
-            $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-            $this->issue = $issueDao->getById($this->publication->getData('issueId'), $submission->getData('contextId'), true);
+            $this->issue = Repo::issue()->get($this->publication->getData('issueId'), $submission->getData('contextId'), true);
         }
     }
 

@@ -15,6 +15,7 @@
 
 import('classes.controllers.grid.issues.IssueGridHandler');
 
+use APP\facades\Repo;
 use PKP\linkAction\LinkAction;
 use PKP\linkAction\request\AjaxModal;
 
@@ -57,8 +58,7 @@ class FutureIssueGridHandler extends IssueGridHandler
     protected function loadData($request, $filter)
     {
         $journal = $request->getJournal();
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
-        return $issueDao->getUnpublishedIssues($journal->getId());
+        return Repo::issue()->getUnpublishedIssues($journal->getId());
     }
 
     /**

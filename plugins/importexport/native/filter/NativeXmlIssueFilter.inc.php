@@ -13,6 +13,8 @@
  * @brief Base class that converts a Native XML document to a set of issues
  */
 
+use APP\facades\Repo;
+
 import('lib.pkp.plugins.importexport.native.filter.NativeImportFilter');
 
 class NativeXmlIssueFilter extends NativeImportFilter
@@ -76,7 +78,6 @@ class NativeXmlIssueFilter extends NativeImportFilter
         $deployment = $this->getDeployment();
         $context = $deployment->getContext();
 
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
         // if the issue identification matches an existing issue, flag to process only child objects
         $issueExists = false;
         $issue = $this->_issueExists($node);
@@ -84,16 +85,16 @@ class NativeXmlIssueFilter extends NativeImportFilter
             $issueExists = true;
         } else {
             // Create and insert the issue (ID needed for other entities)
-            $issue = $issueDao->newDataObject();
+            $issue = Repo::issue()->newDataObject();
             $issue->setJournalId($context->getId());
             $issue->setPublished($node->getAttribute('published'));
             $issue->setCurrent($node->getAttribute('current'));
             $issue->setAccessStatus($node->getAttribute('access_status'));
             $issue->setData('urlPath', $node->getAttribute('url_path'));
             if ($issue) {
-                $issueDao->updateCurrent($context->getId());
+                Repo::issue()->updateCurrent($context->getId());
             }
-            $issueDao->insertObject($issue);
+            Repo::issue()->add($issue);
             $deployment->addProcessedObjectId(ASSOC_TYPE_ISSUE, $issue->getId());
             $deployment->addImportedRootEntity(ASSOC_TYPE_ISSUE, $issue);
         }
@@ -105,7 +106,7 @@ class NativeXmlIssueFilter extends NativeImportFilter
             }
         }
         if (!$issueExists) {
-            $issueDao->updateObject($issue); // Persist setters
+            Repo::issue()->edit($issue, []); // Persist setters
         }
         return $issue;
     }
@@ -459,11 +460,10 @@ class NativeXmlIssueFilter extends NativeImportFilter
         $deployment = $this->getDeployment();
         $context = $deployment->getContext();
         $issue = null;
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
         foreach ($node->getElementsByTagName('issue_identification') as $n) {
-            $searchIssue = $issueDao->newDataObject();
+            $searchIssue = Repo::issue()->newDataObject();
             $this->parseIssueIdentification($n, $searchIssue, false);
-            $foundIssues = $issueDao->getIssuesByIdentification($context->getId(), $searchIssue->getVolume(), $searchIssue->getNumber(), $searchIssue->getYear(), (array) $searchIssue->getTitle(null));
+            $foundIssues = Repo::issue()->getIssuesByIdentification($context->getId(), $searchIssue->getVolume(), $searchIssue->getNumber(), $searchIssue->getYear(), (array) $searchIssue->getTitle(null));
             foreach ($foundIssues->toArray() as $issue) {
                 $deployment->addWarning(ASSOC_TYPE_ISSUE, $issue->getId(), __('plugins.importexport.native.import.error.issueIdentificationDuplicate', ['issueId' => $issue->getId(), 'issueIdentification' => $n->ownerDocument->saveXML($n)]));
             }

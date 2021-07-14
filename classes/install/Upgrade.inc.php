@@ -16,16 +16,11 @@
 namespace APP\install;
 
 use APP\core\Application;
-
-use APP\core\Application;
 use APP\facades\Repo;
 use APP\file\PublicFileManager;
-use APP\file\PublicFileManager;
 
 use APP\template\TemplateManager;
-use APP\template\TemplateManager;
 use Illuminate\Support\Facades\DB;
-use PKP\db\DAORegistry;
 use PKP\db\DAORegistry;
 use PKP\file\FileManager;
 
@@ -229,17 +224,17 @@ class Upgrade extends Installer
      */
     public function localizeIssueCoverImages()
     {
-        $issueDao = DAORegistry::getDAO('IssueDAO'); /* @var $issueDao IssueDAO */
+        $deprecatedIssueDao = Repo::issue()->dao->deprecatedDao;
         $publicFileManager = new PublicFileManager();
         // remove strange old cover images with array values in the DB - from 3.alpha or 3.beta?
-        $issueDao->update('DELETE FROM issue_settings WHERE setting_name = \'coverImage\' AND setting_type = \'object\'');
+        $deprecatedIssueDao->update('DELETE FROM issue_settings WHERE setting_name = \'coverImage\' AND setting_type = \'object\'');
 
         // remove empty 3.0 cover images
-        $issueDao->update('DELETE FROM issue_settings WHERE setting_name = \'coverImage\' AND locale = \'\' AND setting_value = \'\'');
-        $issueDao->update('DELETE FROM issue_settings WHERE setting_name = \'coverImageAltText\' AND locale = \'\' AND setting_value = \'\'');
+        $deprecatedIssueDao->update('DELETE FROM issue_settings WHERE setting_name = \'coverImage\' AND locale = \'\' AND setting_value = \'\'');
+        $deprecatedIssueDao->update('DELETE FROM issue_settings WHERE setting_name = \'coverImageAltText\' AND locale = \'\' AND setting_value = \'\'');
 
         // get cover image duplicates, from 2.4.x and 3.0
-        $result = $issueDao->retrieve(
+        $result = $deprecatedIssueDao->retrieve(
             'SELECT DISTINCT iss1.issue_id, iss1.setting_value, i.journal_id
 			FROM issue_settings iss1
 			LEFT JOIN issues i ON (i.issue_id = iss1.issue_id)
@@ -252,11 +247,11 @@ class Upgrade extends Installer
             if ($publicFileManager->fileExists($publicFileManager->getContextFilesPath($row->journal_id) . '/' . $oldFileName)) {
                 $publicFileManager->removeContextFile($row->journal_id, $oldFileName);
             }
-            $issueDao->update('DELETE FROM issue_settings WHERE issue_id = ? AND setting_name = \'fileName\' AND setting_value = ?', [(int) $row->issue_id, $oldFileName]);
+            $deprecatedIssueDao->update('DELETE FROM issue_settings WHERE issue_id = ? AND setting_name = \'fileName\' AND setting_value = ?', [(int) $row->issue_id, $oldFileName]);
         }
 
         // retrieve names for unlocalized issue cover images
-        $result = $issueDao->retrieve(
+        $result = $deprecatedIssueDao->retrieve(
             'SELECT iss.issue_id, iss.setting_value, j.journal_id, j.primary_locale
 			FROM issue_settings iss, issues i, journals j
 			WHERE iss.setting_name = \'coverImage\' AND iss.locale = \'\'
@@ -277,13 +272,13 @@ class Upgrade extends Installer
             case 'mysql':
             case 'mysqli':
                 // Update cover image names in the issue_settings table
-                $issueDao->update(
+                $deprecatedIssueDao->update(
                     'UPDATE issue_settings iss, issues i, journals j
 					SET iss.locale = j.primary_locale, iss.setting_value = CONCAT(LEFT( iss.setting_value, LOCATE(\'.\', iss.setting_value) - 1 ), \'_\', j.primary_locale, \'.\', SUBSTRING_INDEX(iss.setting_value,\'.\',-1))
 					WHERE iss.setting_name = \'coverImage\' AND iss.locale = \'\' AND i.issue_id = iss.issue_id AND j.journal_id = i.journal_id'
                 );
                 // Update cover image alt texts in the issue_settings table
-                $issueDao->update(
+                $deprecatedIssueDao->update(
                     'UPDATE issue_settings iss, issues i, journals j SET iss.locale = j.primary_locale WHERE iss.setting_name = \'coverImageAltText\' AND iss.locale = \'\' AND i.issue_id = iss.issue_id AND j.journal_id = i.journal_id'
                 );
                 break;
@@ -293,14 +288,14 @@ class Upgrade extends Installer
             case 'postgres8':
             case 'postgres9':
                 // Update cover image names in the issue_settings table
-                $issueDao->update(
+                $deprecatedIssueDao->update(
                     'UPDATE issue_settings
 					SET locale = j.primary_locale, setting_value = REGEXP_REPLACE(issue_settings.setting_value, \'[\.]\', CONCAT(\'_\', j.primary_locale, \'.\'))
 					FROM issues i, journals j
 					WHERE issue_settings.setting_name = \'coverImage\' AND issue_settings.locale = \'\' AND i.issue_id = issue_settings.issue_id AND j.journal_id = i.journal_id'
                 );
                 // Update cover image alt texts in the issue_settings table
-                $issueDao->update(
+                $deprecatedIssueDao->update(
                     'UPDATE issue_settings
 					SET locale = j.primary_locale
 					FROM issues i, journals j
@@ -309,7 +304,7 @@ class Upgrade extends Installer
                 break;
             default: fatalError('Unknown database type!');
         }
-        $issueDao->flushCache();
+        $deprecatedIssueDao->flushCache();
         return true;
     }
 
