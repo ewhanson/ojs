@@ -18,8 +18,8 @@ namespace APP\plugins;
 use APP\core\Application;
 use APP\core\Services;
 use APP\facades\Repo;
-use APP\notification\NotificationManager;
 use APP\issue\Issue;
+use APP\notification\NotificationManager;
 
 use APP\submission\Submission;
 use PKP\core\JSONMessage;
@@ -249,25 +249,7 @@ abstract class PubIdPlugin extends \PKP\plugins\PKPPubIdPlugin
                 break;
 
             default:
-                $pubIdSuffix = PKPString::regexp_replace('/[^A-Za-z0-9]/', '', PKPString::strtolower($context->getAcronym($context->getPrimaryLocale())));
-
-                if ($issue) {
-                    $pubIdSuffix .= '.v' . $issue->getVolume() . 'i' . $issue->getNumber();
-                } else {
-                    $pubIdSuffix .= '.v%vi%i';
-                }
-
-                if ($submission) {
-                    $pubIdSuffix .= '.' . $submission->getId();
-                }
-
-                if ($representation) {
-                    $pubIdSuffix .= '.g' . $representation->getId();
-                }
-
-                if ($submissionFile) {
-                    $pubIdSuffix .= '.f' . $submissionFile->getId();
-                }
+                $pubIdSuffix = $this->generateDefaultPattern($context, $issue, $submission, $representation, $submission);
         }
         if (empty($pubIdSuffix)) {
             return null;
@@ -277,6 +259,41 @@ abstract class PubIdPlugin extends \PKP\plugins\PKPPubIdPlugin
         $pubId = $this->constructPubId($pubIdPrefix, $pubIdSuffix, $contextId);
 
         return $pubId;
+    }
+
+    /**
+     * Generate the default, semantic-based pub-id pattern suffix
+     *
+     * @param $context
+     * @param null $issue
+     * @param null $submission
+     * @param null $representation
+     * @param null $submissionFile
+     *
+     */
+    public static function generateDefaultPattern($context, $issue = null, $submission = null, $representation = null, $submissionFile = null): string
+    {
+        $pubIdSuffix = PKPString::regexp_replace('/[^A-Za-z0-9]/', '', PKPString::strtolower($context->getAcronym($context->getPrimaryLocale())));
+
+        if ($issue) {
+            $pubIdSuffix .= '.v' . $issue->getVolume() . 'i' . $issue->getNumber();
+        } else {
+            $pubIdSuffix .= '.v%vi%i';
+        }
+
+        if ($submission) {
+            $pubIdSuffix .= '.' . $submission->getId();
+        }
+
+        if ($representation) {
+            $pubIdSuffix .= '.g' . $representation->getId();
+        }
+
+        if ($submissionFile) {
+            $pubIdSuffix .= '.f' . $submissionFile->getId();
+        }
+
+        return $pubIdSuffix;
     }
 
     //

@@ -38,6 +38,39 @@
 				"nullable"
 			]
 		},
+        "enableDois": {
+            "type": "boolean",
+            "default": 0,
+            "validation": [
+                "nullable"
+            ]
+        },
+        "enabledDoiTypes": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "validation": [
+                    "in:article,galley,issue"
+                ]
+            }
+        },
+        "doiPrefix": {
+            "type": "string",
+            "validation": [
+                "regex:/^10\\.[0-9]{4,7}$/"
+            ]
+        },
+        "useDefaultDoiSuffix": {
+          "type": "boolean",
+          "default": true
+        },
+        "customDoiSuffixType": {
+            "type": "string"
+        },
+        "registrationAgency": {
+          "type": "string",
+          "default": "none"
+        },
 		"enableOpenAccessNotification": {
 			"type": "boolean",
 			"validation": [

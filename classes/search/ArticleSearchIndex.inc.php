@@ -34,6 +34,10 @@ class ArticleSearchIndex extends SubmissionSearchIndex
      */
     public function submissionMetadataChanged($submission)
     {
+        // Update now stale DOI status re: metadata changes
+        $doiIds = Repo::doi()->getDoisForSubmission($submission->getId());
+        Repo::doi()->updateStaleDoisStatus($doiIds);
+
         // Check whether a search plug-in jumps in.
         $hookResult = HookRegistry::call(
             'ArticleSearchIndex::articleMetadataChanged',
