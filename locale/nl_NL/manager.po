@@ -1808,12 +1808,6 @@ msgstr "Het DOI voorvoegsel wordt toegekend door de registrerende instantie (bv.
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Het DOI voorvoegsel is verplicht en heeft de volgende vorm: 10.xxxx."
 
-msgid "doi.manager.settings.doiSuffix"
-msgstr "DOI Achtervoegsel"
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr "Een DOI achtervoegsel kan iedere gewenste vorm hebben, maar moet uniek zijn tussen alle objecten met hetzelfde DOI voorvoegsel:"
-
 msgid "doi.manager.settings.doiSuffixPattern"
 msgstr "Gebruik onderstaand patroon om DOI achtervoegsels te genereren. Gebruik %j voor de initialen van het tijdschrift, %v voor het bandnummer, %i voor het nummer, %Y voor het jaar, %a voor het OJS ID van het artikel, %g voor het OJS ID van de proef, %f voor het OJS ID van het bestand, *p voor het paginanummer en %x voor \"Aangepaste identificatie\"."
 
@@ -1828,15 +1822,6 @@ msgstr "voor artikels"
 
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "voor proeven"
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "Gebruik standaard patronen."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr "%j.v%vi%i voor nummerss<br />%j.v%vi%i.%a voor artikels<br />%j.v%vi%i.%a.g%g voor proeven."
-
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr "Voeg een individueel DOI achtervoegsel in voor elk gepubliceerd item. U vindt een bijkomend URN invoerveld bij de metadata voor elk item."
 
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Kies het DOI voorvoegsel voor nummers."

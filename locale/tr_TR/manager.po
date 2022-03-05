@@ -2108,14 +2108,6 @@ msgstr "DOI Ön Ekleri kayıt ajansları (Örneğin; <a href=\"http://www.crossr
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "DOI ön eki zorunludur ve 10.xxxx biçiminde olmalıdır."
 
-msgid "doi.manager.settings.doiSuffix"
-msgstr "DOI Son Eki"
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr ""
-"Bir DOI son ek dosyası herhangi bir biçimi alabilir, fakat tüm yayınlanmış "
-"nesneler arasında aynı DOI ön eki almışlar arasında tekil olmalıdır:"
-
 msgid "doi.manager.settings.doiSuffixPattern.issues"
 msgstr "sayılar için"
 
@@ -2130,12 +2122,6 @@ msgstr ""
 "Örneğin; vol%viss%ipp%p kodlaması, 10.1234/vol3iss2pp230 gibi bir DOI "
 "yaratabilir"
 
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "varsayılan örneği/şablonu kullan."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr "Sayılar için %j.v%vi%i<br />makaleler için %j.v%vi%i.%a<br />dizgi tablaları için %j.v%vi%i.%a.g%g."
-
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Lütfen sayılar için örnek/şablon DOI son ekini giriniz."
 
@@ -2144,9 +2130,6 @@ msgstr "Lütfen makaleler için örnek/şablon DOI son ekini giriniz."
 
 msgid "doi.manager.settings.doiRepresentationSuffixPatternRequired"
 msgstr "Lütfen dizgi tablaları için örnek/şablon DOI son ekini gibiniz."
-
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr "Yayınlanan her bir öğe için ayrı bir DOI soneki girin. Her bir öğenin üst veri sayfasında ek bir DOI giriş alanı bulacaksınız."
 
 msgid "doi.manager.settings.doiReassign"
 msgstr "DOI'leri yeniden ata"

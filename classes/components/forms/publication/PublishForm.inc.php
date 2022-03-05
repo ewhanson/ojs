@@ -124,7 +124,7 @@ class PublishForm extends FormComponent
     {
         $request = Application::get()->getRequest();
         $context = $request->getContext();
-        $enabledDoiTypes = $context->getData(Context::SETTING_ENABLED_DOI_TYPES);
+        $enabledDoiTypes = $context->getData(Context::SETTING_ENABLED_DOI_TYPES) ?? [];
 
         $publicationDoiEnabled = in_array(Repo::doi()::TYPE_PUBLICATION, $enabledDoiTypes);
         $galleyDoiEnabled = in_array(Repo::doi()::TYPE_REPRESENTATION, $enabledDoiTypes);

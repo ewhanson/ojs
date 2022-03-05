@@ -1821,9 +1821,6 @@ msgstr "إن بادئة DOI يتم تعيينها من قبل وكالات ال�
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "إن بادئة DOI هي إجبارية وينبغي أن تكون بصيغة 10.xxxx."
 
-msgid "doi.manager.settings.doiSuffix"
-msgstr "لاحقة DOI"
-
 msgid "doi.manager.settings.doiSuffixDescription"
 msgstr "يمكن للاحقة DOI أن تأخذ أي شكل، لكنها يجب أن تكون فريدة بين كل المكونات المنشورة التي تمتلك نفس بادئة DOI:"
 
@@ -1841,15 +1838,6 @@ msgstr "للمقالات"
 
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "للألواح الطباعية"
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "استعمل الأنماط الافتراضية."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr "%j.v%vi%i للأعداد<br />%j.v%vi%i.%a للمقالات<br />%j.v%vi%i.%a.g%g للألواح الطباعية."
-
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr "أدخل لاحقة DOI منفردة لكل فقرة منشورة مستقلة ومختلفة عن \"المعرف المخصص\" المذكور في الخيار السابق. ستجد حقل إدخال DOI إضافي في كل صفحة بيانات وصفية."
 
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "لطفاً، أدخل نمط لاحقة DOI للأعداد."
@@ -1962,11 +1950,6 @@ msgstr ""
 
 msgid "doi.editor.doi.assignDoi"
 msgstr "تعيين"
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr ""
-"لاحقة معرف المكون الرقمي يمكنها أن تكون بأي تنسيق، لكنها لا بد أن تكون فريدة "
-"ما بين كل المكونات المنشورة المنضوية تحت نفس البادئة."
 
 msgid "doi.manager.settings.doiPrefix.description"
 msgstr ""

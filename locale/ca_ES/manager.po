@@ -2063,19 +2063,6 @@ msgstr "Introduïu el patró del sufix DOI per a articles."
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Introduïu el patró del sufix DOI per a números."
 
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr ""
-"Introduïu un sufix DOI individual per a cada element publicat. Trobareu un "
-"camp d'entrada DOI addicional en la pàgina de metadades de cada element."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr ""
-"%j.v%vi%i per a números<br />%j.v%vi%i.%a per a articles<br />%j.v%vi%i.%a.g%"
-"g per a galerades."
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "Utilitzar patrons predeterminats."
-
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "per a galerades"
 
@@ -2096,14 +2083,6 @@ msgstr ""
 "número, %Y per a l'any, %a per a l'ID de l'article d'OJS, %g per a l'ID de "
 "la galerada d'OJS, %f per a l'ID de l'arxiu d'OJS, %p per al número de "
 "pàgina i %x per a \"identificador personalitzat\"."
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr ""
-"El sufix DOI pot tenir qualsevol forma, però ha de ser únic entre tots els "
-"objectes publicables amb el mateix prefix DOI assignat:"
-
-msgid "doi.manager.settings.doiSuffix"
-msgstr "Sufix DOI"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "El prefix DOI és obligatori i ha de seguir el format 10.xxxx."

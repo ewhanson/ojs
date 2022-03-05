@@ -2200,19 +2200,6 @@ msgstr "Vui lòng nhập mẫu hậu tố DOI cho các bài báo."
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Vui lòng nhập mẫu hậu tố DOI cho các số."
 
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr ""
-"Nhập một hậu tố DOI riêng cho mỗi mục được xuất bản. Bạn sẽ tìm thấy một "
-"trường nhập DOI bổ sung trên trang dữ liệu meta của từng mục."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr ""
-"%j.v%vi%i cho các số<br />%j.v%vi%i.%a cho các bài báo<br />%j.v%vi%i.%a.g%g "
-"cho các bản in."
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "Sử dụng các mẫu mặc định."
-
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "cho các bản in"
 
@@ -2232,14 +2219,6 @@ msgstr ""
 "tắt của tạp chí, %v cho số tập, %i cho số phát hành, %Y cho năm ,%a cho ID "
 "bài báo OJS, %g cho ID bản in OJS, %f cho ID tập tin OJS , %p cho số trang "
 "và %x cho \"Số nhận dạng tùy chỉnh\"."
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr ""
-"Hậu tố DOI có thể có bất kỳ dạng nào, nhưng phải là duy nhất trong số tất cả "
-"các đối tượng xuất bản có cùng tiền tố DOI được gán:"
-
-msgid "doi.manager.settings.doiSuffix"
-msgstr "Hậu tố DOI"
 
 msgid "doi.manager.settings.doiPrefix.description"
 msgstr ""

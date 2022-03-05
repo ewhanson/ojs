@@ -1621,12 +1621,6 @@ msgstr "پیشوند DOI توسط مراجع ثبت کننده اختصاص دا
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "شناسه DOI باید به فرمت 10.xxxx باشد."
 
-msgid "doi.manager.settings.doiSuffix"
-msgstr "پسوند DOI"
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr "پشوند DOI میتواند در هر فرمتی باشد فقط باید توجه شود که به ازای یک پیشوند اختصاص داده شده DOI، این پسوندها منحصر به فرد باشد"
-
 msgid "doi.manager.settings.doiSuffixPattern"
 msgstr "برای تولید پسوندهای DOI از الگوی زیر استفاده کنید. %j برای مجله، %v برای دوره، %i برای شماره، %Y برای سال، %a برای شناسه مقاله، %g برای شناسه کلیشه چاپی، %f برای شناسه فایل، %p برای شماره صفحه و %x برای شناسه سفارشی"
 
@@ -1641,15 +1635,6 @@ msgstr "برای مقالات"
 
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "برای کلیشه های چاپی"
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "استفاده از الگوی پیشفرض"
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr "%j.v%vi%i برای شماره ها<br />%j.v%vi%i.%a برای مقالات<br />%j.v%vi%i.%a.g%g برای کلیشه های چاپی."
-
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr "یک پسوند DOI منحصر به فرد برای هر مورد منتشر شده وارد کنید. یک فیلد DOI در صفحه فراداده های هر مورد مشاهده خواهید کرد."
 
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "لطفاً الگوی پسوند شناسه DOI برای شماره ها را وارد کنید"

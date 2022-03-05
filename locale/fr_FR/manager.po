@@ -2030,19 +2030,6 @@ msgstr "Veuillez entrer le modèle de suffixe DOI pour les articles."
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Veuillez entrer le modèle de suffixe DOI pour les numéros."
 
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr ""
-"Entrez un suffixe DOI individuel pour chaque élément publié. Vous trouverez "
-"un champ DOI additionnel sur la page de métadonnées de chaque élément."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr ""
-"%j.v%vi%i pour les numéros<br />%j.v%vi%i.%a pour les articles<br "
-"/>%j.v%vi%i.%a.g%g pour les épreuves."
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "Utiliser les modèles par défaut."
-
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "pour les épreuves"
 
@@ -2063,14 +2050,6 @@ msgstr ""
 "pour l'année, %a pour l'identifiant de l'article dans OJS, %g pour le numéro "
 "de l'épreuve, %f pour l'identifiant du fichier, %p pour le numéro de page et "
 "%x pour un numéro personnalisé."
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr ""
-"Un suffixe DOI peut prendre n'importe quelle forme, mais doit être unique au "
-"sein de l'ensemble des objets publiés avec le même préfixe :"
-
-msgid "doi.manager.settings.doiSuffix"
-msgstr "Suffixe DOI"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Le préfixe DOI est obligatoire et doit être sous la forme 10.xxxx."

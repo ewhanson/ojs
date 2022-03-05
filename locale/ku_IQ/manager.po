@@ -2194,19 +2194,6 @@ msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr ""
 "تکایە پاشگری ناسێنەری سەرچاوە دیجیتاڵییەکان بۆ ژمارەکانی گۆڤار داخل بکە."
 
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr ""
-"تکایە پاشگری DOI بۆ هەر بڵاوکراوەیەک داخل بکە. تۆ شوێنی داخلکردنەکە لە پەیجی "
-"زانیاریی ناسێنەری هەر دانەیەکدا دەدۆزیتەوە."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr ""
-"%j.v%vi%i بۆ ژمارەکان<br />%j.v%vi%i.%a بۆ توێژینەوەکان<br />%j.v%vi%i.%a.g%"
-"g بۆ تابلۆکان."
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "ڕێکخستنە بنەڕەتییەکان بەکار بهێنە."
-
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "بۆ تابلۆکان"
 
@@ -2228,15 +2215,6 @@ msgstr ""
 "ناسنامەی توێژینەوەکە لە سیستەمی گۆڤاری کراوەدا، %g بۆ تابلۆی توێژینەوەکە لە "
 "سیستەمی گۆڤاری کراوەدا، %f بۆ ناسنامەی سیستەمی گۆڤاری کراوەی توێژینەوەکە، %p "
 "بۆ ژمارەی لاپەڕە و %x بۆ ناسێنەری ڕاسپێردراو."
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr ""
-"پاشگری ناسێنەری سەرچاوە دیجیتاڵییەکان دەکرێت بە هەر جۆرێک ڕیز بکرێت، بەڵام "
-"نابێت هاوشێوەی بڵاوکراوەکانی دیکە بێت و دەبێت هەمان شت بێت لەگەڵ پێشگری "
-"ئەرکدارکراوی ناسێنەری سەرچاوە دیجیتاڵییەکان:"
-
-msgid "doi.manager.settings.doiSuffix"
-msgstr "پاشگری ناسێنەری سەرچاوە دیجیتاڵییەکان"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr ""

@@ -2316,19 +2316,6 @@ msgstr "Introduza o padrón do sufixo DOI para os artigos."
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Introduza o padrón do sufixo DOI para os números."
 
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr ""
-"Introduza un sufixo DOI individual para cada elemento publicado. Atoparás un "
-"campo de entrada DOI adicional na páxina de metadatos de cada elemento."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr ""
-"%j.v%vi%i para os números<br />%j.v%vi%i.%a para os artigos<br "
-"/>%j.v%vi%i.%a.g%g para as galeradas."
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "Usar padróns por defecto."
-
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "para as galeradas"
 
@@ -2349,14 +2336,6 @@ msgstr ""
 "número do número, %Y para o ano, %a para o ID do artigo OJS, %g para o ID da "
 "galerada OJS, %f para o ID do arquivo OJS , %p para o número de páxina e %x "
 "para \"Identificador personalizado\"."
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr ""
-"Un sufixo DOI pode adoptar calquera forma, pero debe ser único entre todos "
-"os obxectos da publicación co mesmo prefixo DOI asignado:"
-
-msgid "doi.manager.settings.doiSuffix"
-msgstr "Sufixo DOI"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "O prefixo DOI é obrigatorio e debe ter a forma 10.xxxx."

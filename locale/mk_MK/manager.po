@@ -2299,20 +2299,6 @@ msgstr "Внесете ја шемата за наставки на ДОИ за 
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Внесете ја шемата на наставката ДОИ за изданија."
 
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr ""
-"Внесете индивидуален додаток на ДОИ за секоја објавена ставка. Ќе најдете "
-"дополнително поле за внесување DOI на страницата со мета-податоци на секоја "
-"ставка."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr ""
-"%j.v%vi%i за изданија<br />%j.v%vi%i.%a за написиs<br />%j.v%vi%i.%a.g%g за "
-"отисоци на труд."
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "Користете стандардни обрасци."
-
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "за отисоците на труд"
 
@@ -2334,14 +2320,6 @@ msgstr ""
 "%i за бројот на изданието, %Y за годината, %a за ID на статијата OJS, %g за "
 "ID галеријата OJS, %f за ID на датотеката OJS , %p за бројот на страницата и "
 "%x за \"Прилагоден идентификатор\"."
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr ""
-"Додаток на ДОИ може да има каква било форма, но мора да биде единствен меѓу "
-"сите објавувачки објекти со ист доделен префикс ДОИ:"
-
-msgid "doi.manager.settings.doiSuffix"
-msgstr "Додаток на ДОИ"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Префиксот DOI е задолжителен и мора да биде во форма 10.xxxx."

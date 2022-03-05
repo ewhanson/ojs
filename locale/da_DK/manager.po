@@ -1973,12 +1973,6 @@ msgstr "DOI-præfikset tildeles af registreringsorganisationer (f.eks. <a href=\
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "DOI-præfikset er obligatorisk og skal være i formatet 10.xxxx."
 
-msgid "doi.manager.settings.doiSuffix"
-msgstr "DOI-suffiks"
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr "Et DOI-suffiks kan antage en hvilken som helst form, men det skal være unikt for hvert enkelt udgivet element under samme DOI-præfiksgruppe:"
-
 msgid "doi.manager.settings.doiSuffixPattern"
 msgstr "Brug nedenstående format til at generere DOI-suffikser ud fra. Anvend %j til tidsskriftsinitialer, %v til årgangsnummer, %i til nummeret i årgangen, %Y til året, %a til OJS-artikel-id, %g til OJS-satsskibs-id, %f til OJS fil-id %p til sidenummer og %x til \"Custom Identifier\"."
 
@@ -1993,17 +1987,6 @@ msgstr "til artikler"
 
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "til publiceringsversioner"
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "Anvend standardformaterne."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr ""
-"%j.v%vi%i til numre<br />%j.v%vi%i.%a til artikler<br />%j.v%vi%i.%a.g%g til "
-"publiceringsversioner."
-
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr "Indskriv et særskilt DOI-suffiks for hvert publiceret element. Der findes et ekstra DOI-felt på hvert elements metadataside."
 
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Indsæt DOI-suffiks-formatet til numre."

@@ -2184,19 +2184,6 @@ msgstr "Zadajte, prosím, vzor DOI suffixu pre články."
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Zadajte, prosím, vzor DOI suffixu pre čísla."
 
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr ""
-"Pre každú publikovanú položku zadajte individuálny suffix DOI. Na stránke "
-"metadát každej položky nájdete ďalšie vstupné pole DOI."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr ""
-"%j.v%vi%i pre čísla<br />%j.v%vi%i.%a pre články<br />%j.v%vi%i.%a.g%g pre "
-"sadzobnice."
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "Použiť predvolené vzory."
-
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "pre sadzobnice"
 
@@ -2215,14 +2202,6 @@ msgstr ""
 "iniciály časopisu, %v pre číslo zväzku ,%i pre číslo časopisu, %Y pre rok, %"
 "a pre ID článku v rámci OJS, %g pre ID sadzobnice v rámci OJS, % f pre ID "
 "súbore v rámci OJS , %P pre číslo stránky a %x pre \"Vlastný identifikátor\"."
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr ""
-"Suffix DOI môže mať akúkoľvek formu, ale musí byť jedinečný medzi všetkými "
-"publikovanými objektami s rovnakým prefixom DOI:"
-
-msgid "doi.manager.settings.doiSuffix"
-msgstr "Suffix DOI"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Prefix DOI je povinný a musí byť vo formáte 10.xxxx."

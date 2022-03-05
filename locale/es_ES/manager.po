@@ -1906,12 +1906,6 @@ msgstr "El prefijo DOI lo asignan las agencias registradoras (p. ej., <a href=\"
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "El prefijo DOI es obligatorio y sigue el formato 10.xxxx."
 
-msgid "doi.manager.settings.doiSuffix"
-msgstr "Sufijo DOI"
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr "El sufijo DOI puede tomar cualquier forma, pero debe ser único entre todos los objetos de publicación con el mismo prefijo DOI asignado:"
-
 msgid "doi.manager.settings.doiSuffixPattern"
 msgstr ""
 "Usa el patrón introducido abajo para generar sufijos DOI. Usa %j para "
@@ -1932,15 +1926,6 @@ msgstr "para artículos"
 
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "para galeradas"
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "Usar patrones por defecto."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr "%j.v%vi%i para números<br />%j.v%vi%i.%a para artículos<br />%j.v%vi%i.%a.g%g para galeradas."
-
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr "Introduzca un sufijo DOI individual para cada elemento publicado. Encontrará un campo DOI adicional en la página de metadatos de cada elemento."
 
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Introduzca el patrón del sufijo DOI para números."

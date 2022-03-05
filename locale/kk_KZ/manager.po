@@ -2280,19 +2280,6 @@ msgstr "Мақалалар үшін DOI жұрнағының үлгісін ен
 msgid "doi.manager.settings.doiIssueSuffixPatternRequired"
 msgstr "Басылымдар үшін DOI жұрнағының үлгісін енгізіңіз."
 
-msgid "doi.manager.settings.doiSuffixCustomIdentifier"
-msgstr ""
-"Әр жарияланған элемент үшін жеке DOI жұрнағын енгізіңіз. Бұдан кейін әр "
-"элемент үшін метадеректер бетінде қосымша DOI енгізу жолағын көре аласыз."
-
-msgid "doi.manager.settings.doiSuffixDefault.description"
-msgstr ""
-"%j.v%vi%i журнал басылымдары үшін<br />%j.v%vi%i.%a мақалалар үшін<br "
-"/>%j.v%vi%i.%a.g%g электрондық жазбалар үшін."
-
-msgid "doi.manager.settings.doiSuffixDefault"
-msgstr "Негізгі үлгілерді қолданыңыз."
-
 msgid "doi.manager.settings.doiSuffixPattern.representations"
 msgstr "электрондық жазба үшін"
 
@@ -2313,14 +2300,6 @@ msgstr ""
 "%Y, OJS-тегі мақаланың ID үшін %a, OJS-Тегі Gran ID үшін %g, OJS-тегі файл "
 "идентификаторы үшін %f, бет нөмірі үшін %p және \"жеке жұрнақ\"үшін %x "
 "қолданыңыз."
-
-msgid "doi.manager.settings.doiSuffix.description"
-msgstr ""
-"DOI жұрнағы кез-келген формада болуы мүмкін, бірақ бірдей DOI префиксі "
-"барлық жарияланған нысандар арасында ерекше болуы керек:"
-
-msgid "doi.manager.settings.doiSuffix"
-msgstr "DOI жұрнағы"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "DOI префиксі міндетті және 10.xxxx түрінде болуы керек."
