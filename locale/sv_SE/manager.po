@@ -1849,17 +1849,12 @@ msgstr "DOI"
 msgid "doi.manager.settings.description"
 msgstr "Konfigurera DOI-pluginet för att kunna administrera och använda DOI:er i OJS:"
 
-msgid "doi.manager.settings.doiObjects"
-msgstr "Tidskriftens innehåll"
-
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "Välj de objekt som ska tilldelas DOI:er."
 
 msgid "doi.manager.settings.explainDois"
 msgstr "Välj de publiceringsobjekt som kommer att få Digital Object Identifiers (DOI:er) tilldelade sig:"
-
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Nummer"
 
 msgid "doi.manager.settings.enableSubmissionDoi"
 msgstr "Artiklar"
@@ -1869,9 +1864,6 @@ msgstr "Publiceringsversioner"
 
 msgid "doi.manager.settings.doiPrefix"
 msgstr "DOI-prefix"
-
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr "DOI-prefix delas ut av t.ex. <a href=\"http://www.crossref.org\" target=\"_new\">Crossref</a> och är i formatet 10.xxxx (t.ex. 10.1234):"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "DOI-prefixet är obligatoriskt och måste vara i formatet 10.xxxx."
@@ -1980,9 +1972,6 @@ msgstr "Tilldela"
 
 msgid "doi.editor.doi.description"
 msgstr "DOI måste börja med {$prefix}."
-
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Artiklar"
 
 msgid "doi.editor.missingParts"
 msgstr ""

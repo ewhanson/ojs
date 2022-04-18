@@ -1878,17 +1878,12 @@ msgstr "DOI"
 msgid "doi.manager.settings.description"
 msgstr "Silahkan konfigurasikan plugin DOI untuk dapat mengatur dan menggunakan DOIs dalam OJS:"
 
-msgid "doi.manager.settings.doiObjects"
-msgstr "Konten Jurnal"
-
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "Silahkan pilih objek DOIs yang harus ditugaskan."
 
 msgid "doi.manager.settings.explainDois"
 msgstr "Silahkan pilih objek penerbitan yang akan memiliki penugasan Digital Object Identifiers (DOI):"
-
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Terbitan"
 
 msgid "doi.manager.settings.enableSubmissionDoi"
 msgstr "Artikel"
@@ -1898,9 +1893,6 @@ msgstr "Galai"
 
 msgid "doi.manager.settings.doiPrefix"
 msgstr "Awalan DOI"
-
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr "Awalan DOI ditugaskan dengan agensi pendaftaran (contoh <a href=\"http://www.crossref.org\" target=\"_new\">Crossref</a>) dan dalam format 10.xxxx (contoh 10.1234):"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Awalan DOI wajib dan harus format 10.xxxx."
@@ -2056,9 +2048,6 @@ msgstr ""
 "terdampak. Setelah konfigurasi DOI disimpan, gunakan tombol ini untuk "
 "menghapus semua DOI yang ada sehingga pengaturan baru akan diberlakukan pada "
 "objek yang ada."
-
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Artikel"
 
 msgid "doi.description"
 msgstr ""

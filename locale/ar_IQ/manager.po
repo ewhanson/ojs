@@ -1794,17 +1794,12 @@ msgstr "DOI"
 msgid "doi.manager.settings.description"
 msgstr "لطفاً، قم بتهيئة إضافة DOI لتتمكن من إدارة واستعمال DOI في نظام المجلات المفتوحة:"
 
-msgid "doi.manager.settings.doiObjects"
-msgstr "محتوى المجلة"
-
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "لطفاً، إختر المكونات التي على DOI أن تتعين لها."
 
 msgid "doi.manager.settings.explainDois"
 msgstr "لطفاً، إختر مكونات النشر التي ستكون لها معرفات للمكونات الرقمية (DOI) معينة لها:"
-
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "الأعداد"
 
 msgid "doi.manager.settings.enableSubmissionDoi"
 msgstr "المقالات"
@@ -1815,7 +1810,8 @@ msgstr "الألواح الطباعية"
 msgid "doi.manager.settings.doiPrefix"
 msgstr "بادئة DOI"
 
-msgid "doi.manager.settings.doiPrefix.Description"
+#, fuzzy
+msgid "doi.manager.settings.doiPrefix.description"
 msgstr "إن بادئة DOI يتم تعيينها من قبل وكالات التسجيل (مثل: <a href=\"http://www.crossref.org\" target=\"_new\">Crossref</a>) وهي بصيغة 10.xxxx (مثل: 10.1234):"
 
 msgid "doi.manager.settings.doiPrefixPattern"
@@ -1950,12 +1946,3 @@ msgstr ""
 
 msgid "doi.editor.doi.assignDoi"
 msgstr "تعيين"
-
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr ""
-"إن معرف المكون الرقمي يتم تعيينه من قبل وكالات التسجيل (كما في <a href=\""
-"http://www.crossref.org\" target=\"_new\">Crossref</a>) وهو بالتنسيق الآتي  "
-"10.xxxx (مثلاً 10.1234):"
-
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "المقالات"

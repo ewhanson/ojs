@@ -1781,17 +1781,12 @@ msgstr "DOI"
 msgid "doi.manager.settings.description"
 msgstr "Configureer de DOI plugin om DOIs in OJS te kunnen beheren en gebruiken:"
 
-msgid "doi.manager.settings.doiObjects"
-msgstr "Tijdschriftinhoud"
-
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "Kies de objecten waar DOI's aan toegekend moeten worden."
 
 msgid "doi.manager.settings.explainDois"
 msgstr "Kies de objecten waaraan Digital Object Identifiers (DOI) toegekend worden:"
-
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Nummers"
 
 msgid "doi.manager.settings.enableSubmissionDoi"
 msgstr "Artikels"
@@ -1801,9 +1796,6 @@ msgstr "Proeven"
 
 msgid "doi.manager.settings.doiPrefix"
 msgstr "DOI voorvoegsel"
-
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr "Het DOI voorvoegsel wordt toegekend door de registrerende instantie (bv. <a href=\"http://www.crossref.org\" target=\"_new\">Crossref</a>) en heeft als format 10.xxxx (bv. 10.1234):"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Het DOI voorvoegsel is verplicht en heeft de volgende vorm: 10.xxxx."
@@ -1935,6 +1927,3 @@ msgstr "Toewijzen"
 
 msgid "doi.editor.doi.description"
 msgstr "De DOI moet beginnen met {$prefix}."
-
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Artikelen"

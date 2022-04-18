@@ -42,8 +42,9 @@ msgid "manager.distribution.publishingMode.subscription"
 msgstr "The journal will require subscriptions to access some or all of its contents."
 
 msgid "manager.setup.enableDois.description"
-msgstr "Assign Digital Object Identifiers (DOIs) to articles, issues and galleys."
+msgstr "Allow Digital Object Identifiers (DOIs) to be assigned to work published in this journal."
 
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "Select which items will be assigned a DOI. Most journals assign DOIs to articles, but you may wish to assign DOIs to all of the published items."
 
@@ -51,7 +52,7 @@ msgid "doi.manager.settings.doiSuffixLegacy"
 msgstr "Use default patterns.<br />%j.v%vi%i for issues<br />%j.v%vi%i.%a for articles<br />%j.v%vi%i.%a.g%g for galleys."
 
 msgid "doi.manager.settings.doiCreationTime.copyedit"
-msgstr "At the copy-editing stage"
+msgstr "Upon reaching the copyediting stage"
 
 msgid "manager.website.archiving"
 msgstr "Archiving"
@@ -1797,29 +1798,21 @@ msgstr "DOIs"
 msgid "doi.manager.settings.description"
 msgstr "Please configure the DOI plugin to be able to manage and use DOIs in OJS:"
 
-msgid "doi.manager.settings.doiObjects"
-msgstr "Journal Content"
-
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
-msgstr "Please choose the objects DOIs should be assigned to."
+msgstr "Select the types of work published in this journal that should be assigned DOIs. Most journals only assign DOIs to articles."
 
 msgid "doi.manager.settings.explainDois"
 msgstr "Please select the publishing objects that will have Digital Object Identifiers (DOI) assigned:"
 
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Issues"
-
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Articles"
-
 msgid "doi.manager.settings.enableRepresentationDoi"
-msgstr "Galleys"
+msgstr "Article Galleys"
+
+msgid "doi.manager.settings.galleysWithDescription"
+msgstr "Article galleys, such as a published PDF"
 
 msgid "doi.manager.settings.doiPrefix"
 msgstr "DOI Prefix"
-
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr "The DOI Prefix is assigned by registration agencies (e.g. <a href=\"http://www.crossref.org\" target=\"_new\">Crossref</a>) and is in the format 10.xxxx (e.g. 10.1234):"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "The DOI prefix is mandatory and must be in the form 10.xxxx."

@@ -1914,29 +1914,18 @@ msgstr "DOI"
 msgid "doi.manager.settings.description"
 msgstr "Bitte konfigurieren Sie das DOI-Plugin, damit Sie DOI in OJS verwalten und benutzen können:"
 
-msgid "doi.manager.settings.doiObjects"
-msgstr "Zeitschrifteninhalt"
-
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "Bitte wählen Sie, welchen Objekten DOI zugewiesen werden sollen."
 
 msgid "doi.manager.settings.explainDois"
 msgstr "Bitte wählen Sie die Publikationsobjekte, denen Digital Object Identifiers (DOI) zugewiesen werden:"
 
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Ausgaben"
-
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Artikel"
-
 msgid "doi.manager.settings.enableRepresentationDoi"
 msgstr "Fahnen"
 
 msgid "doi.manager.settings.doiPrefix"
 msgstr "DOI-Präfix"
-
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr "Der DOI-Präfix wird von Registrierungsagenturen (z.B. <a href=\"http://www.crossref.org\" target=\"_new\">Crossref</a>) vergeben und hat das Format 10.xxxx (z.B. 10.1234):"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Der DOI-Präfix ist verpflichtend und muss im Format 10.xxxx angegeben werden."

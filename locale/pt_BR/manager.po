@@ -1952,29 +1952,18 @@ msgstr "DOI"
 msgid "doi.manager.settings.description"
 msgstr "Configure o plugin DOI para gerenciar e usar DOIs no OJS:"
 
-msgid "doi.manager.settings.doiObjects"
-msgstr "Conteúdo"
-
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "Escolha a quais objetos serão atribuídos DOIs."
 
 msgid "doi.manager.settings.explainDois"
 msgstr "Escolha os objetos publicados que terão Identificadores de Objeto Digital (DOI) atribuídos:"
 
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Edições"
-
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Artigos"
-
 msgid "doi.manager.settings.enableRepresentationDoi"
 msgstr "Composições"
 
 msgid "doi.manager.settings.doiPrefix"
 msgstr "Prefixo DOI"
-
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr "O prefixo DOI é atribuído por agências de registro (ex.: <a href=\"http://www.crossref.org\" target=\"_new\">Crossref</a>) e possui o formato 10.xxxx (ex.: 10.1234):"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "O prefixo DOI é obrigatório e deve possuir o formato 10.xxxx."

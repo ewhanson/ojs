@@ -2276,32 +2276,18 @@ msgstr ""
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "DOI პრეფიქსი სავალდებულოა და უნდა იყოს 10.xxxx ფორმატში."
 
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr ""
-"DOI პრეფიქსი ენიჭება სარეგისტრაციო სააგენტოს მიერ (მაგალითად, <a href=\""
-"http://www.crossref.org\" target=\"_new\">Crossref</a>) და წარმოდგენილია "
-"10.xxxx ფორმატში (მაგალითად, 10.1234):"
-
 msgid "doi.manager.settings.doiPrefix"
 msgstr "DOI პრეფიქსი"
 
 msgid "doi.manager.settings.enableRepresentationDoi"
 msgstr "გალერეები"
 
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "სტატიები"
-
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "გამოცემები"
-
 msgid "doi.manager.settings.explainDois"
 msgstr "გთხოვთ აირჩიოთ გამოქვეყნებული ობიექტები, რომლებსაც ექნებათ DOI:"
 
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "გთხოვთ აირჩიოთ ობიექტები, რომლებსაც უნდა მიენიჭოს DOI."
-
-msgid "doi.manager.settings.doiObjects"
-msgstr "ჟურნალის შიგთავსი"
 
 msgid "doi.manager.settings.description"
 msgstr ""

@@ -1633,17 +1633,12 @@ msgstr "DOI"
 msgid "doi.manager.settings.description"
 msgstr "Щоб мати можливість використовувати DOI у OJS, будь ласка, налаштуйте модуль DOI:"
 
-msgid "doi.manager.settings.doiObjects"
-msgstr "Зміст журналу"
-
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "Будь ласка, оберіть об'єкти, для яких мають призначатись DOI."
 
 msgid "doi.manager.settings.explainDois"
 msgstr "Будь ласка, оберіть об'єкти, які матимуть призначені для них унікальні цифрові ідентифікатори DOI:"
-
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Випуски"
 
 msgid "doi.manager.settings.enableSubmissionDoi"
 msgstr "Статті"
@@ -1653,9 +1648,6 @@ msgstr "Гранки"
 
 msgid "doi.manager.settings.doiPrefix"
 msgstr "Префікс DOI"
-
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr "Префікс DOI призначається виданню реєстраційною агенцією (наприклад, <a href=\"http://www.crossref.org\" target=\"_new\">Crossref</a>), його формат 10.xxxx (наприклад, 10.1234):"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Префікс є обов'язковим елементом DOI, він має бути у формі 10.xxxx."
@@ -1746,9 +1738,6 @@ msgstr "Не можна призначити DOI {$pubId}, оскільки ві
 
 msgid "doi.editor.assignDoi.assigned"
 msgstr "DOI {$pubId} був призначений."
-
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Статті"
 
 msgid "doi.editor.missingParts"
 msgstr ""

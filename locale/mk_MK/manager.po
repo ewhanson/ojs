@@ -2324,34 +2324,20 @@ msgstr ""
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Префиксот DOI е задолжителен и мора да биде во форма 10.xxxx."
 
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr ""
-"Префиксот DOI е доделен од агенциите за регистрација (на пр. <a href=\""
-"http://www.crossref.org\" target=\"_new\">Crossref</a>) и е во формат "
-"10.xxxx (на пример, 10.1234):"
-
 msgid "doi.manager.settings.doiPrefix"
 msgstr "Префикс на ДОИ"
 
 msgid "doi.manager.settings.enableRepresentationDoi"
 msgstr "Отисоци на труд"
 
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Написи"
-
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Изданија"
-
 msgid "doi.manager.settings.explainDois"
 msgstr ""
 "Изберете ги објектите за објавување на кои ќе им бидат доделени "
 "идентификатори на дигитални објекти (ДОИ):"
 
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "Ве молиме, изберете ги предметите на кои треба да се доделат ДОИ."
-
-msgid "doi.manager.settings.doiObjects"
-msgstr "Содржина на весник"
 
 msgid "doi.manager.settings.description"
 msgstr ""

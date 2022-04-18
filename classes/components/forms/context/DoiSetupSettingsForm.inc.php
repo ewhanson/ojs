@@ -33,21 +33,21 @@ class DoiSetupSettingsForm extends PKPDoiSetupSettingsForm
             'options' => [
                 [
                     'value' => Repo::doi()::TYPE_PUBLICATION,
-                    'label' => __('doi.manager.settings.enableFor', ['objects' => __('doi.manager.settings.publications')]),
+                    'label' => __('article.articles'),
                 ],
                 [
                     'value' => Repo::doi()::TYPE_ISSUE,
-                    'label' => __('doi.manager.settings.enableFor', ['objects' => __('issue.issues')]),
+                    'label' => __('issue.issues'),
                 ],
                 [
                     'value' => Repo::doi()::TYPE_REPRESENTATION,
-                    'label' => __('doi.manager.settings.enableFor', ['objects' => __('submission.layout.galleys')]),
+                    'label' => __('doi.manager.settings.galleysWithDescription'),
                 ]
             ],
             'value' => $context->getData(Context::SETTING_ENABLED_DOI_TYPES) ? $context->getData(Context::SETTING_ENABLED_DOI_TYPES) : [],
         ]), [FIELD_POSITION_BEFORE, Context::SETTING_DOI_PREFIX])
             ->addField(new FieldText(Repo::doi()::CUSTOM_ISSUE_PATTERN, [
-                'label' => __('doi.manager.settings.enableIssueDoi'),
+                'label' => __('issue.issues'),
                 'groupId' => self::DOI_CUSTOM_SUFFIX_GROUP,
                 'value' => $context->getData(Repo::doi()::CUSTOM_ISSUE_PATTERN),
             ]));

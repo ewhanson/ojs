@@ -2115,17 +2115,12 @@ msgstr "DOI"
 msgid "doi.manager.settings.description"
 msgstr "Skonfiguruj wtyczkę DOI aby móc zarządzać DOI w OJS:"
 
-msgid "doi.manager.settings.doiObjects"
-msgstr "Zawartość czasopisma"
-
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "Wybierz obiekt dla którego powinno zostać przypisane DOI."
 
 msgid "doi.manager.settings.explainDois"
 msgstr "Wybierz publikowane obiekty, dla których zostanie przypisane DOI:"
-
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Numery"
 
 msgid "doi.manager.settings.enableSubmissionDoi"
 msgstr "Artykuły"
@@ -2135,9 +2130,6 @@ msgstr "Pliki"
 
 msgid "doi.manager.settings.doiPrefix"
 msgstr "Prefiks DOI"
-
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr "Prefiks DOI jest przydzielany przez organizacje rejestrujące, np. <a href=\"http://www.crossref.org\" target=\"_new\">Crossref</a> i posiada format 10.xxxx (np. 10.1234):"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Prefiks DOI jest wymagany i musi posiadać formę 10.xxx."
@@ -2269,6 +2261,3 @@ msgstr "Przydziel"
 
 msgid "doi.editor.doi.description"
 msgstr "DOI musi zaczynać się od {$prefix}."
-
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Artykuły"

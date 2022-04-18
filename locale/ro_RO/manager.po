@@ -2286,33 +2286,19 @@ msgstr ""
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "Prefixul DOI este obligatoriu și trebuie să aibă forma 10.xxxx."
 
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr ""
-"Prefixul DOI este atribuit de agențiile de înregistrare(de ex. <a href=\""
-"http://www.crossref.org\" target=\"_new\">Crossref</a>) și are formatul "
-"10.xxxx (de ex. 10.1234):"
-
 msgid "doi.manager.settings.doiPrefix"
 msgstr "Prefix DOI"
 
 msgid "doi.manager.settings.enableRepresentationDoi"
 msgstr "Galerii"
 
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Articole"
-
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Numere"
-
 msgid "doi.manager.settings.explainDois"
 msgstr "Vă rugăm să selectați elementele de publicare cărora li se vor DOI:"
 
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr ""
 "Vă rugăm să alegeți obiectele la care trebuie să li se atribuie DOI-urile."
-
-msgid "doi.manager.settings.doiObjects"
-msgstr "Conținutul jurnalului"
 
 msgid "doi.manager.settings.description"
 msgstr ""

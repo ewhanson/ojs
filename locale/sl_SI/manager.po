@@ -1983,17 +1983,12 @@ msgstr "DOI"
 msgid "doi.manager.settings.description"
 msgstr "Za upravljanje in uporabo DOI-jev prosimo nastavite DOI vtičnik:"
 
-msgid "doi.manager.settings.doiObjects"
-msgstr "Vsebina revije"
-
+#, fuzzy
 msgid "doi.manager.settings.doiObjectsRequired"
 msgstr "Prosimo izberite objekte, ki se jim bodo dodelili DOI-ji."
 
 msgid "doi.manager.settings.explainDois"
 msgstr "Prosimo izberite objekte, ki se jim bodo dodelili DOI-ji:"
-
-msgid "doi.manager.settings.enableIssueDoi"
-msgstr "Številke"
 
 msgid "doi.manager.settings.enableSubmissionDoi"
 msgstr "Prispevki"
@@ -2003,9 +1998,6 @@ msgstr "Prelomi"
 
 msgid "doi.manager.settings.doiPrefix"
 msgstr "DOI predpona"
-
-msgid "doi.manager.settings.doiPrefix.description"
-msgstr "DOI predpono dodeli registracijska agencija (npr. <a href=\"http://www.crossref.org\" target=\"_new\">Crossref</a>) in je oblike 10.xxxx (npr. 10.1234):"
 
 msgid "doi.manager.settings.doiPrefixPattern"
 msgstr "DOI predpona je obvezna in mora biti oblike 10.xxxx."
@@ -2120,9 +2112,6 @@ msgstr "Dodeli"
 
 msgid "doi.editor.doi.description"
 msgstr "DOI se mora začeti z {$prefix}."
-
-msgid "doi.manager.settings.enablePublicationDoi"
-msgstr "Članki"
 
 msgid "doi.editor.preview.objects"
 msgstr "Postavka"
