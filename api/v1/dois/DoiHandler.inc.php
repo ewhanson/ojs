@@ -36,6 +36,13 @@ class DoiHandler extends PKPDoiHandler
         $this->_endpoints = array_merge_recursive($this->_endpoints, [
             'POST' => [
                 [
+                    'pattern' => $this->getEndpointPattern() . '/issues/assignDois',
+                    'handler' => [$this, 'assignIssueDois'],
+                    'roles' => [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SITE_ADMIN]
+                ]
+            ],
+            'PUT' => [
+                [
                     'pattern' => $this->getEndpointPattern() . '/issues/export',
                     'handler' => [$this, 'exportIssues'],
                     'roles' => [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SITE_ADMIN],
@@ -50,12 +57,7 @@ class DoiHandler extends PKPDoiHandler
                     'handler' => [$this, 'markIssuesRegistered'],
                     'roles' => [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SITE_ADMIN],
                 ],
-                [
-                    'pattern' => $this->getEndpointPattern() . '/issues/assignDois',
-                    'handler' => [$this, 'assignIssueDois'],
-                    'roles' => [Role::ROLE_ID_MANAGER, Role::ROLE_ID_SITE_ADMIN]
-                ]
-            ]
+            ],
         ]);
         parent::__construct();
     }
@@ -211,7 +213,7 @@ class DoiHandler extends PKPDoiHandler
         $context = $this->getRequest()->getContext();
         $doiPrefix = $context->getData(Context::SETTING_DOI_PREFIX);
         if (empty($doiPrefix)) {
-            return $response->withStatus(400)->withJsonError('api.dois.400.prefixRequired');
+            return $response->withStatus(403)->withJsonError('api.dois.403.prefixRequired');
         }
 
         $failedDoiCreations = [];
