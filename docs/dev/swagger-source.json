@@ -80,6 +80,10 @@
 			"description": "Only admins and journal managers can access these endpoints."
 		},
 		{
+			"name": "DOIs / Issues",
+			"description": "Only admins and journal managers can access these endpoints."
+		},
+		{
 			"name": "Vocabs",
 			"description": "Handle controlled vocabularies like keywords and subjects. Only admins, journal managers, subeditors, assistants and authors can access these endpoints."
 		},
@@ -3969,7 +3973,6 @@
 					"DOIs"
 				],
 				"summary": "Get a list of DOIs.",
-				"description": "TODO",
 				"parameters": [
 					{
 						"name": "status",
@@ -4057,7 +4060,6 @@
 					"DOIs"
 				],
 				"summary": "Get a DOI by ID.",
-				"description": "TODO",
 				"parameters": [
 					{
 						"name": "doiId",
@@ -4149,7 +4151,6 @@
 					"DOIs"
 				],
 				"summary": "Delete a DOI.",
-				"description": "Only journal managers and subeditors can make a request to this endpoint.",
 				"parameters": [
 					{
 						"name": "doiId",
@@ -4162,9 +4163,9 @@
 				"responses": {
 					"200": {
 						"x-summary": "Success",
-						"description": "Details of the deleted submission.",
+						"description": "Details of the deleted DOI.",
 						"schema": {
-							"$ref": "#/definitions/Submission"
+							"$ref": "#/definitions/Doi"
 						}
 					},
 					"403": {
@@ -4190,7 +4191,7 @@
 					"DOIs"
 				],
 				"summary": "Schedule all DOIs for deposit.",
-				"description": "TODO",
+				"description": "Schedules all publication objects with DOIs enabled that are published and include DOIs for deposit with the configured registration agency. DOIs will be queued and handled by the Jobs system in the order in which they were added.",
 				"responses": {
 					"200": {
 						"x-summary": "Success",
@@ -4205,7 +4206,7 @@
 					"DOIs"
 				],
 				"summary": "Download exported DOI metadata.",
-				"description": "Download exported DOI XML from temporary file ID",
+				"description": "Download exported DOI XML from temporary file ID.",
 				"parameters": [],
 				"responses": {
 					"200": {
@@ -4412,6 +4413,226 @@
 					{
 						"name": "ids",
 						"description": "Submission IDs",
+						"in": "query",
+						"required": true,
+						"type": "array",
+						"items": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"x-summary": "Success",
+						"description": "An empty response body."
+					},
+					"400": {
+						"x-summary": "Request Invalid",
+						"description": "There was an error marking the DOIs as registered.\n\n|Error Code|Description|\n|---|---|\n|`api.dois.400.invalidPubObjectIncluded`|One or more invalid publication objects were included with the request.|\n|`api.dois.400.markRegisteredFailed`|An error occurred and some of the submitted items were not marked registered.|",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					},
+					"404": {
+						"x-summary": "Request Not Found",
+						"description": "No valid publication objects were included with the request.",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					}
+				}
+			}
+		},
+		"/dois/issues/assignDois": {
+			"post": {
+				"tags": [
+					"DOIs / Issues"
+				],
+				"summary": "Assign DOIs to Issues.",
+				"description": "Assign DOIs to issues if enabled as eligible publication objects in DOI settings.",
+				"parameters": [
+					{
+						"name": "ids",
+						"description": "Issue IDs",
+						"in": "query",
+						"required": true,
+						"type": "array",
+						"items": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"x-summary": "Success",
+						"description": "List of failed issues (will be empty on success).",
+						"schema": {
+							"type": "object",
+							"properties": {
+								"failedDoiCreations": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								}
+							},
+							"example": {
+								"failedDoiCreations": []
+							}
+						}
+					},
+					"400": {
+						"x-summary": "Request Invalid",
+						"description": "List of failed issues and why DOIs could not be created for them.",
+						"schema": {
+							"type": "object",
+							"properties": {
+								"failedDoiCreations": {
+									"type": "array",
+									"items": {
+										"type": "string"
+									}
+								}
+							},
+							"example": {
+								"failedDoiCreations": [
+									"Could not create a DOI for the following issue: Issue Title. It does not exist in the current journal context."
+								]
+							}
+						}
+					},
+					"403": {
+						"x-summary": "Request Unauthorized",
+						"description": "A DOI prefix is required to generate DOIs.",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					},
+					"404": {
+						"x-summary": "Request Not Found",
+						"description": "The issue could not be found.",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					}
+				}
+			}
+		},
+		"/dois/issues/export": {
+			"put": {
+				"tags": [
+					"DOIs / Issues"
+				],
+				"summary": "Export Issue DOIs.",
+				"description": "This will export depositable metadata for the currently configured DOI registration agency.",
+				"parameters": [
+					{
+						"name": "ids",
+						"description": "Issue IDs",
+						"in": "query",
+						"required": true,
+						"type": "array",
+						"items": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"x-summary": "Success",
+						"description": "An object with the temporary file ID needed to download the exported data.",
+						"schema": {
+							"type": "object",
+							"properties": {
+								"temporaryFileId": {
+									"type": "integer"
+								}
+							},
+							"example": {
+								"temporaryFileId": 1
+							}
+						}
+					},
+					"400": {
+						"x-summary": "Request Invalid",
+						"description": "The export could not be completed because of invalid request parameters or other required settings.\n\n|Error Code|Description|\n|---|---|\n|`api.dois.400.invalidPubObjectIncluded`|One or more invalid publication objects were included with the request.|\n|`api.dois.400.noRegistrationAgencyConfigured`|No DOI registration agency has been configured for this journal.|\n|`api.dois.400.xmlExportFailed`|An XML validation error occurred and the XML could not be exported.|",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					},
+					"404": {
+						"x-summary": "Request Not Found",
+						"description": "The export could not be completed because an issue or DOI could not be found with the corresponding ID.\n\n|Error Code|Description|\n|---|---|\n|`api.dois.404.noPubObjectIncluded`|No valid publication objects were included with the request.|\n|`api.dois.404.doiNotFound`|The DOI you requested was not found.|",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					}
+				}
+			}
+		},
+		"/dois/issues/deposit": {
+			"put": {
+				"tags": [
+					"DOIs / Issues"
+				],
+				"summary": "Deposit Issue DOIs.",
+				"description": "This will deposit the specified issue DOIs with the currently configured DOI registration agency.",
+				"parameters": [
+					{
+						"name": "ids",
+						"description": "Issue IDs",
+						"in": "query",
+						"required": true,
+						"type": "array",
+						"items": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"x-summary": "Success",
+						"description": "An object containing the deposit response message.",
+						"schema": {
+							"type": "object",
+							"properties": {
+								"responseMessage": {
+									"type": "string"
+								}
+							},
+							"example": {
+								"responseMessage": "Registration successful!"
+							}
+						}
+					},
+					"400": {
+						"x-summary": "Request Invalid",
+						"description": "There was an error when submitting the DOIs to the registration agency.\n\n|Error Code|Description|\n|---|---|\n|`api.dois.400.invalidPubObjectIncluded`|One or more invalid publication objects were included with the request.|\n|`api.dois.400.noRegistrationAgencyConfigured`|No DOI registration agency has been configured for this journal.|\n|`api.dois.400.depositFailed`|Some items were not deposited successfully. Please check the individual items for their specific error messages.|",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					},
+					"404": {
+						"x-summary": "Request Not Found",
+						"description": "The deposit could not be completed because a submission or DOI could not be found with the corresponding ID.\n\n|Error Code|Description|\n|---|---|\n|`api.dois.404.noPubObjectIncluded`|No valid publication objects were included with the request.|\n|`api.dois.404.doiNotFound`|The DOI you requested was not found.|",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					}
+				}
+			}
+		},
+		"/dois/issues/markRegistered": {
+			"put": {
+				"tags": [
+					"DOIs / Issues"
+				],
+				"summary": "Mark Issue DOIs registered.",
+				"description": "This will mark the specified issue DOIs as registered. This can be done to indicate the items were deposited outside of OJS.",
+				"parameters": [
+					{
+						"name": "ids",
+						"description": "Issue IDs",
 						"in": "query",
 						"required": true,
 						"type": "array",
@@ -4684,6 +4905,150 @@
 					"200": {
 						"x-summary": "Success",
 						"description": "List of submissions."
+					}
+				}
+			}
+		},
+		"/_dois/publications/{publicationId}": {
+			"put": {
+				"tags": [
+					"Backend"
+				],
+				"summary": "Update publication with DOI.",
+				"description": "This endpoints allows publications to have DOI IDs added or removed regardless of publication status",
+				"parameters": [
+					{
+						"name": "publicationId",
+						"in": "path",
+						"description": "Publication ID",
+						"required": true,
+						"type": "integer"
+					},
+					{
+						"name": "doiId",
+						"in": "query",
+						"description": "DOI ID",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"x-summary": "Success",
+						"description": "The publication that was just edited with the new values after the update has occurred.",
+						"schema": {
+							"$ref": "#/definitions/Publication"
+						}
+					},
+					"403": {
+						"x-summary": "Request Unauthorized",
+						"description": "You cannot edit an item's DOI that is not in this context.",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					},
+					"404": {
+						"x-summary": "Request Not Found",
+						"description": "Either the publication or DOI could not be found.\n\n|Error Code|Description|\n|---|---|\n|`api.404.resourceNotFound`|The requested resource was not found.|\n|`api.dois.404.doiNotFound`|The DOI you requested was not found.|",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					}
+				}
+			}
+		},
+		"/_dois/issues/{issueId}": {
+			"put": {
+				"tags": [
+					"Backend"
+				],
+				"summary": "Update issue with DOI.",
+				"description": "This endpoints allows issues to have DOI IDs added or removed regardless of publication status",
+				"parameters": [
+					{
+						"name": "issueId",
+						"in": "path",
+						"description": "Issue ID",
+						"required": true,
+						"type": "integer"
+					},
+					{
+						"name": "doiId",
+						"in": "query",
+						"description": "DOI ID",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"x-summary": "Success",
+						"description": "The issue that was just edited with the new values after the update has occurred.",
+						"schema": {
+							"$ref": "#/definitions/Issue"
+						}
+					},
+					"403": {
+						"x-summary": "Request Unauthorized",
+						"description": "You cannot edit an item's DOI that is not in this context.",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					},
+					"404": {
+						"x-summary": "Request Not Found",
+						"description": "Either the issue or DOI could not be found.\n\n|Error Code|Description|\n|---|---|\n|`api.404.resourceNotFound`|The requested resource was not found.|\n|`api.dois.404.doiNotFound`|The DOI you requested was not found.|",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					}
+				}
+			}
+		},
+		"/_dois/galleys/{galleyId}": {
+			"put": {
+				"tags": [
+					"Backend"
+				],
+				"summary": "Update galley with DOI.",
+				"description": "This endpoints allows galleys to have DOI IDs added or removed regardless of publication status",
+				"parameters": [
+					{
+						"name": "galleyId",
+						"in": "path",
+						"description": "Galley ID",
+						"required": true,
+						"type": "integer"
+					},
+					{
+						"name": "doiId",
+						"in": "query",
+						"description": "DOI ID",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"x-summary": "Success",
+						"description": "The galley that was just edited with the new values after the update has occurred.",
+						"schema": {
+							"$ref": "#/definitions/Galley"
+						}
+					},
+					"403": {
+						"x-summary": "Request Unauthorized",
+						"description": "You cannot edit an item's DOI that is not in this context.",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
+					},
+					"404": {
+						"x-summary": "Request Not Found",
+						"description": "Either the galley or DOI could not be found.\n\n|Error Code|Description|\n|---|---|\n|`api.404.resourceNotFound`|The requested resource was not found.|\n|`api.dois.404.doiNotFound`|The DOI you requested was not found.|",
+						"schema": {
+							"$ref": "#/definitions/ErrorResponse"
+						}
 					}
 				}
 			}
