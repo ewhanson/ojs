@@ -143,6 +143,11 @@ user_validation_period = 28
 ; Use this for development or testing purposes.
 sandbox = Off
 
+; This value determines the "environment" your application is currently running in.
+; This may determine how you prefer to configure various services the application utilizes.
+; Valid options include 'production', 'local', or 'development'
+app_env = production
+
 
 ;;;;;;;;;;;;;;;;;;;;;
 ; Database Settings ;
